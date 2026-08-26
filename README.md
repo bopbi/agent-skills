@@ -35,14 +35,14 @@ Or copy the individual skill folders into `~/.claude/skills/` (user-level) or `.
 
 Plans recommend a **tier** — the cheapest one that can reliably execute each step — judged by **ambiguity and blast radius**, not by feature importance. The tier is provider-neutral; the plan then names a concrete model for whichever provider you use.
 
-| Tier | Use for | Claude | OpenAI | Google |
-|---|---|---|---|---|
-| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | Haiku 4.5 | GPT-5 mini / nano | Gemini 2.5 Flash-Lite |
-| standard | default: 2–5 files, clear requirement, established pattern | Sonnet 5 | GPT-5 / GPT-5.1 | Gemini 2.5 Flash |
-| large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | Opus 5 | GPT-5.1 (high reasoning) / GPT-5-Codex | Gemini 2.5 Pro / 3 Pro |
-| frontier | genuinely hard *and* costly to get wrong | Fable 5 | GPT-5.1 Pro / o3-pro | Gemini 3 Pro (Deep Think) |
+| Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
+|---|---|---|---|---|---|---|---|
+| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | Haiku 4.5 | GPT-5.6 Luna | Gemini 3.5 Flash-Lite | Kimi K2.6 (cheapest current, not a small model) | qwen3.7-flash / qwen3-coder-flash | Grok Build 0.1 (beta) |
+| standard | default: 2–5 files, clear requirement, established pattern | Sonnet 5 | GPT-5.6 Terra | Gemini 3.7 Flash | Kimi K2.7-Code | qwen3.7-plus / qwen3-coder-next | Grok 4.3 |
+| large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | Opus 5 | GPT-5.6 Sol | Gemini 3.1 Pro (preview) | Kimi K3 | Qwen3.8-Max | Grok 4.6 |
+| frontier | genuinely hard *and* costly to get wrong | Fable 5 | GPT-5.5 Pro | Gemini 3.1 Pro (no higher tier yet) | Kimi K3 (`kimi-k3-swarm-max`, unverified) | Qwen3.8-Max (no higher tier) | Grok 4.6 (no Heavy API model) |
 
-Model names are as of early 2026; edit the table in each `SKILL.md` as providers ship new ones. Switch models before the relevant step (Claude Code: `/model <name>`).
+Model names are as of August 2026; edit the table in each `SKILL.md` as providers ship new ones. Switch models before the relevant step (Claude Code: `/model <name>`).
 
 ## License
 

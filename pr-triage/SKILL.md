@@ -110,14 +110,14 @@ The user wants to conserve spend. Recommend the **cheapest tier that can reliabl
 
 ### Tier → model mapping
 
-Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Names as of early 2026 — verify against the provider's current list if unsure.
+Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Names as of **August 2026** (checked against provider docs; entries marked *unverified* came from third-party coverage). Providers ship often — verify against the current model list before relying on an exact name.
 
-| Tier | Use for | Claude | OpenAI | Google |
-|---|---|---|---|---|
-| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | Haiku 4.5 | GPT-5 mini / GPT-5 nano | Gemini 2.5 Flash-Lite |
-| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | Sonnet 5 | GPT-5 / GPT-5.1 | Gemini 2.5 Flash |
-| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | Opus 5 | GPT-5 / GPT-5.1 (high reasoning) or GPT-5-Codex | Gemini 2.5 Pro / Gemini 3 Pro |
-| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | Fable 5 | GPT-5.1 Pro / o3-pro | Gemini 3 Pro (Deep Think) |
+| Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
+|---|---|---|---|---|---|---|---|
+| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | Haiku 4.5 | GPT-5.6 Luna | Gemini 3.5 Flash-Lite | Kimi K2.6 (cheapest current, not a small model) | qwen3.7-flash / qwen3-coder-flash | Grok Build 0.1 (beta) |
+| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | Sonnet 5 | GPT-5.6 Terra | Gemini 3.7 Flash | Kimi K2.7-Code | qwen3.7-plus / qwen3-coder-next | Grok 4.3 |
+| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | Opus 5 | GPT-5.6 Sol | Gemini 3.1 Pro (preview) | Kimi K3 | Qwen3.8-Max | Grok 4.6 |
+| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | Fable 5 | GPT-5.5 Pro | Gemini 3.1 Pro (no higher tier yet) | Kimi K3 (`kimi-k3-swarm-max`, unverified) | Qwen3.8-Max (no higher tier) | Grok 4.6 (no Heavy API model) |
 
 Rules:
 - Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
