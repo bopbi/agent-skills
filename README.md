@@ -24,7 +24,7 @@ Each skill is restricted through `allowed-tools` in its frontmatter, so the "rea
 ## Install
 
 ```bash
-git clone https://github.com/bopbi/claude-skills ~/.claude/skills
+git clone https://github.com/bopbi/agent-skills ~/.claude/skills
 ```
 
 Or copy the individual skill folders into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level).
