@@ -5,7 +5,7 @@ Personal [Claude Code](https://claude.com/claude-code) skills built around one i
 
 ```
 /ask  ──►  /plan-task  ──►  /run-plan   (on the recommended model)
-           /pr-triage  ──►
+           /pr-triage  ──►  /run-plan  ──►  push  ──►  /pr-resolve
 ```
 
 Plans are written as markdown into `plan/` in your repo. They are meant to be read in your editor,
@@ -18,6 +18,7 @@ left untracked (never committed), and never gitignored — so they stay visible 
 | `/ask <question>` | Read-only exploration and Q&A. Answers with `path:line` evidence. Never edits, never offers to. | nothing |
 | `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) mapped to concrete Claude / OpenAI / Google models. Can reuse a prior `/ask` from the same session as its Context. | `plan/<date>-<slug>.md` |
 | `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Hard-stops if any `→ Decision:` line in the plan is blank, and asks if you're on a lower model tier than it recommends. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
+| `/pr-resolve` | The only skill that writes to GitHub. After `/run-plan` finished a `pr-<n>-review` plan and the fix is pushed, builds a reply for every thread from the plan's verdicts (fixed → "Fixed in `<sha>`" + resolve; not-valid / question / out-of-scope → drafted reply, left open for the reviewer), **previews the full list and asks for confirmation**, posts, and logs the result into the plan. `--dry-run` previews only. Depends on `pr-triage/` being installed alongside it. | `plan/<file>.md` (resolution log) + GitHub replies |
 | `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a model recommendation. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
 
 ### Decisions are made while planning, never while executing
@@ -40,7 +41,7 @@ git clone https://github.com/bopbi/agent-skills ~/.claude/skills
 
 Or copy the individual skill folders into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level).
 
-`/pr-triage` needs the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and `jq`.
+`/pr-triage` and `/pr-resolve` need the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and `jq`.
 
 ## Model recommendation rubric
 
