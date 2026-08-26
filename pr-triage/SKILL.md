@@ -56,6 +56,8 @@ For every thread, open the referenced file/lines and decide:
 | ❓ **question / unclear** | Needs an answer, not a change — or you can't determine validity without the user. |
 | 🚫 **out of scope** | Legitimate but belongs in a separate PR. |
 
+**Suggested changes.** A comment containing a ` ```suggestion ` block is a concrete proposed replacement for the thread's line range (`path:start-end` in the fetch output; a single number means one line). Treat it as a proposal to evaluate, not an instruction: compare it against the current code and record one of — *apply as-is*, *apply with modification* (say what and why), or *reject* (say why). Check that it still fits if the lines have moved since the reviewer's commit (the thread will be marked `outdated`).
+
 Be evidence-based, not deferential: a reviewer being senior or a bot being confident does not make a comment valid. Equally, don't dismiss a comment just because the fix is inconvenient. Cite `path:line` for every verdict. If two reviewers conflict, record both and mark for the user's decision.
 
 ## Step 3 — Cluster by root cause, ignoring order
@@ -78,6 +80,7 @@ Path: `plan/<YYYY-MM-DD>-pr-<n>-review.md` (`date +%F`). If one already exists f
 | Thread | Location | Reviewer | Summary | Verdict | Cluster |
 |---|---|---|---|---|---|
 | T1 | `api/client.ts:42` | @alice | rename getData | ✅ valid | Naming |
+| T3 | `api/client.ts:50-58` | @alice | suggestion: early return | ✅ valid (apply as-is) | Error handling |
 | T2 | `api/client.ts:60` | @bob | wrap in Result | ⚠️ partial | Error handling |
 | T4 | `ui/List.tsx:10` | @copilot | possible null | ❌ not valid | — |
 

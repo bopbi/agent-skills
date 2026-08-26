@@ -26,7 +26,7 @@ gh api graphql -f query="$Q" -F owner="$OWNER" -F repo="$REPO" -F pr="$PR" \
   , "## Inline review threads"
   , ( [ $p.reviewThreads.nodes[] | select((env.INCLUDE_RESOLVED=="1") or (.isResolved|not)) ]
       | to_entries[]
-      | "\n### T\(.key+1) `\(.value.path):\(.value.line // .value.startLine // "?")`"
+      | "\n### T\(.key+1) `\(.value.path):\(if .value.startLine and .value.line and .value.startLine != .value.line then "\(.value.startLine)-\(.value.line)" else (.value.line // .value.startLine // "?") end)`"
         + (if .value.isResolved then " (resolved)" else "" end)
         + (if .value.isOutdated then " (outdated)" else "" end)
         + "\nthread_id: \(.value.id)"
