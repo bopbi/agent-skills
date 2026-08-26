@@ -28,6 +28,16 @@ Your only deliverable is a markdown file at `plan/<YYYY-MM-DD>-<slug>.md` in the
 
 If the task is too vague to plan (no identifiable goal), ask one clarifying question instead of writing a file.
 
+## Decisions vs. assumptions — resolve decisions *now*, not at execution
+
+The plan will be executed later, often by a cheaper model with less context. It must be fully specified. While planning, sort every uncertainty into one of three buckets:
+
+- **Decision** — changes *what* gets built (approach A vs B, keep or drop a behaviour, scope trade-off). **Ask the user before writing the file** (one question per decision, options with trade-offs). Only if the user explicitly defers ("decide later") does it go into the plan's "Needs your decision" section — and then the plan states which steps are blocked on it.
+- **Assumption** — you couldn't verify it but there is a sensible default. Do not ask. Write it as a stated default with its fallback: "Assumed X (`path:line` suggests so); if wrong, step 4 becomes Y." The executor follows the default and logs it.
+- **Execution-time unknown** — only answerable while doing the work ("does a test for this exist?"). Never a question: write a conditional step ("If `tests/foo_test.ts` exists, extend it; otherwise create it from `tests/bar_test.ts`").
+
+A plan with zero items under "Needs your decision" is the goal. Every item left there blocks `/run-plan` until the user writes a `→ Decision:` line under it.
+
 ## Before writing
 
 - Ground every step in real code: read the files you name, confirm symbols exist, cite `path:line`.
@@ -64,8 +74,16 @@ Ordered, concrete, each step small enough to verify on its own.
 1. `path/to/file.ext` — what changes and why.
 2. …
 
-## Risks & open questions
-Things that could go wrong, decisions still needed from the user, anything that couldn't be verified.
+## Assumptions
+Stated defaults with fallbacks: "Assumed X; if wrong, step N becomes Y." (Not questions.)
+
+## Needs your decision
+Only decisions the user explicitly deferred while planning. Each item names the steps it blocks and leaves a line for the answer:
+- **D1.** <question> — options: A (…) / B (…). Blocks steps 3–4.
+  → Decision:
+
+## Risks
+Things that could go wrong during execution and what to watch for.
 
 ## Verification
 How to confirm it works: tests to run/add, manual checks, commands.
@@ -100,6 +118,6 @@ Rules:
 
 ## Ending your turn
 
-Reply with: the file path written, a 2–4 sentence summary of the approach, and any open questions that need the user's decision. No "shall I implement this?".
+Reply with: the file path written, a 2–4 sentence summary of the approach, and — if any — the deferred decisions (D1, D2…) that must be answered in the file before `/run-plan` will start. No "shall I implement this?".
 
 $ARGUMENTS

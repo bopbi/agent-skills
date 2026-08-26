@@ -18,7 +18,8 @@ The plan was written deliberately (via `/plan-task` or `/pr-triage`) so that exe
 
 ## Step 1 — Preflight (answer these in your reply before editing anything)
 
-1. **Decisions pending?** If the plan has a non-empty "Needs your decision" section that the user hasn't answered (in the plan or in this conversation), list the items and **stop** — executing on a guess defeats the point of planning. If the user says "use your judgment", record the choice you make in the plan's log.
+1. **Decisions resolved? (hard gate)** Every item under "Needs your decision" must have a filled-in `→ Decision:` line in the plan file. If any is blank, list the open items (D1, D2…) with their options and **stop**. Do not decide yourself, and do not accept "use your judgment" as an answer — the plan was written by a model with more context than you have now. Two ways the user can answer: edit the plan file directly, or tell you the answer in chat, in which case you write it into the `→ Decision:` line (that edit is allowed) and then continue. "Either — pick the simpler one" is a valid recorded decision; a blank line is not.
+   "Assumptions" are different: follow each stated default without asking, and if you find one is wrong, apply its stated fallback and note it in the log.
 2. **Model tier.** Compare the plan's `Overall tier` / `Concrete model` against the model you are running as. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier than recommended for the overall plan or for a specific step/cluster, say so and ask whether to continue anyway or switch (`/model <name>`) — do not silently proceed on a step the plan flagged as needing more.
 3. **Scope.** State the steps you will execute and the files they touch, from the plan. Nothing else.
 

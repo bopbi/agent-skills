@@ -17,8 +17,18 @@ left untracked (never committed), and never gitignored — so they stay visible 
 |---|---|---|
 | `/ask <question>` | Read-only exploration and Q&A. Answers with `path:line` evidence. Never edits, never offers to. | nothing |
 | `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) mapped to concrete Claude / OpenAI / Google models. Can reuse a prior `/ask` from the same session as its Context. | `plan/<date>-<slug>.md` |
-| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Stops first if the plan has unanswered "Needs your decision" items or you're on a lower model tier than it recommends. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
+| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Hard-stops if any `→ Decision:` line in the plan is blank, and asks if you're on a lower model tier than it recommends. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
 | `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a model recommendation. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
+
+### Decisions are made while planning, never while executing
+
+Plans separate three kinds of uncertainty:
+
+- **Decisions** (what to build) — the planner asks you *before* writing the file. Only ones you explicitly defer land in the plan's **Needs your decision** section, each with a blank `→ Decision:` line.
+- **Assumptions** — stated defaults with a fallback ("Assumed X; if wrong, step 4 becomes Y"). The executor follows them and logs it.
+- **Execution-time unknowns** — written as conditional steps, never as questions.
+
+`/run-plan` has a hard gate: it refuses to start while any `→ Decision:` line is blank, and won't accept "use your judgment". Answer in the file (you're reading it in your editor anyway) or in chat — it writes your answer into the file and proceeds. This keeps decisions with the model that had the full context, and keeps the cheap executor from guessing.
 
 Each skill is restricted through `allowed-tools` in its frontmatter, so the "read-only" / "only writes to `plan/`" guarantees are enforced by Claude Code's permission system, not just by prompt wording.
 

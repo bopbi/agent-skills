@@ -58,7 +58,7 @@ For every thread, open the referenced file/lines and decide:
 
 **Suggested changes.** A comment containing a ` ```suggestion ` block is a concrete proposed replacement for the thread's line range (`path:start-end` in the fetch output; a single number means one line). Treat it as a proposal to evaluate, not an instruction: compare it against the current code and record one of — *apply as-is*, *apply with modification* (say what and why), or *reject* (say why). Check that it still fits if the lines have moved since the reviewer's commit (the thread will be marked `outdated`).
 
-Be evidence-based, not deferential: a reviewer being senior or a bot being confident does not make a comment valid. Equally, don't dismiss a comment just because the fix is inconvenient. Cite `path:line` for every verdict. If two reviewers conflict, record both and mark for the user's decision.
+Be evidence-based, not deferential: a reviewer being senior or a bot being confident does not make a comment valid. Equally, don't dismiss a comment just because the fix is inconvenient. Cite `path:line` for every verdict. If two reviewers conflict, or a ⚠️ partial has more than one reasonable fix, that is a **decision**: ask the user now (one question, options with trade-offs) rather than leaving it for execution. Only if the user explicitly defers does it go into "Needs your decision", with the threads it blocks. Anything you couldn't verify but can default sensibly is an **assumption** — state the default and its fallback, don't ask.
 
 ## Step 3 — Cluster by root cause, ignoring order
 
@@ -91,8 +91,13 @@ One short entry per non-✅ thread (and per ✅ thread when the reason isn't obv
 ### Cluster: <name> — threads T2, T5, T9
 Root cause, chosen approach, then ordered concrete steps with file paths.
 
+## Assumptions
+Stated defaults with fallbacks for anything not verifiable from the code. (Not questions.)
+
 ## Needs your decision
-Conflicting reviewers, ⚠️ partials where the alternative fix is a judgment call, ❓ questions.
+Only decisions the user explicitly deferred while triaging. Each names the threads/clusters it blocks and leaves a line for the answer:
+- **D1.** <question> — options: A (…) / B (…). Blocks T2, T5 (cluster "Error handling").
+  → Decision:
 
 ## Non-goals
 🚫 out-of-scope items, and what you're deliberately not doing.
@@ -130,7 +135,7 @@ Rules:
 
 ## Ending your turn
 
-Reply with the plan file path, the thread counts by verdict, the cluster names, and anything in "Needs your decision". No "shall I implement this?".
+Reply with the plan file path, the thread counts by verdict, the cluster names, and — if any — the deferred decisions (D1, D2…) that must be answered in the file before `/run-plan` will start. No "shall I implement this?".
 
 ## Token discipline
 One fetch, one read per file. Don't re-fetch or re-read between clusters. Use `Explore` only when a thread references code you haven't loaded; never one agent per comment.
