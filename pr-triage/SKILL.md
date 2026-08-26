@@ -98,18 +98,32 @@ Conflicting reviewers, ⚠️ partials where the alternative fix is a judgment c
 Tests/lint/typecheck to run for the touched areas; any test that should be added per a comment.
 
 ## Model recommendation
-- **Overall:** <haiku | sonnet | opus | fable> — one sentence why.
-- **Per cluster (only where it differs):** e.g. "Error handling → opus: touches 6 files with shared state."
-- **Switch with:** `/model <name>`.
+- **Overall tier:** <small | standard | large | frontier> — one sentence why.
+- **Concrete model:** <model for the user's provider; see mapping>.
+- **Per cluster (only where it differs):** e.g. "Error handling → large: touches 6 files with shared state."
+- **Switch with:** your tool's model switch (Claude Code: `/model <name>`).
 ```
 
 ### Choosing the model recommendation
-Recommend the **cheapest model that can reliably execute each cluster**, judged by ambiguity and blast radius — not by how loud the reviewer was:
-- `haiku` — mechanical, fully specified by the plan: renames, nits, adding a test that mirrors an existing one, single-site fixes.
-- `sonnet` — default: 2–5 files, clear requirement, established pattern.
-- `opus` — cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, clusters with open questions.
-- `fable` — only if genuinely hard *and* costly to get wrong; say why opus isn't enough.
-Most PR-review rounds are `haiku`/`sonnet`; say so plainly when true.
+
+The user wants to conserve spend. Recommend the **cheapest tier that can reliably execute each cluster**, judged by the cluster's *ambiguity and blast radius* — not by how important the feature is or how loud the reviewer was.
+
+### Tier → model mapping
+
+Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Names as of early 2026 — verify against the provider's current list if unsure.
+
+| Tier | Use for | Claude | OpenAI | Google |
+|---|---|---|---|---|
+| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | Haiku 4.5 | GPT-5 mini / GPT-5 nano | Gemini 2.5 Flash-Lite |
+| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | Sonnet 5 | GPT-5 / GPT-5.1 | Gemini 2.5 Flash |
+| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | Opus 5 | GPT-5 / GPT-5.1 (high reasoning) or GPT-5-Codex | Gemini 2.5 Pro / Gemini 3 Pro |
+| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | Fable 5 | GPT-5.1 Pro / o3-pro | Gemini 3 Pro (Deep Think) |
+
+Rules:
+- Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
+- When clusters vary, give the per-cluster split so the user can run cheap parts on a cheap model and switch only for the hard ones.
+- A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
+- If the whole plan is small and mechanical, say so plainly: "small for everything."
 
 ## Ending your turn
 

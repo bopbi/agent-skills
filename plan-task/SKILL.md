@@ -71,28 +71,32 @@ Things that could go wrong, decisions still needed from the user, anything that 
 How to confirm it works: tests to run/add, manual checks, commands.
 
 ## Model recommendation
-- **Overall:** <haiku | sonnet | opus | fable> — one sentence why.
-- **Per step (only where it differs from overall):** e.g. "Step 3 → opus: cross-module refactor with unclear ownership."
-- **Switch with:** `/model <name>` before starting, and again before any step marked differently.
+- **Overall tier:** <small | standard | large | frontier> — one sentence why.
+- **Concrete model:** <model for the user's provider; see mapping>.
+- **Per step (only where it differs):** e.g. "Step 3 → large: cross-module refactor with unclear ownership."
+- **Switch with:** your tool's model switch (Claude Code: `/model <name>`).
 ```
 
-## Choosing the model recommendation
+### Choosing the model recommendation
 
-The user wants to conserve spend. Recommend the **cheapest model that can reliably execute each step**, not the best one. Judge by the step's *ambiguity and blast radius*, not by how important the feature is:
+The user wants to conserve spend. Recommend the **cheapest tier that can reliably execute each step**, judged by the step's *ambiguity and blast radius* — not by how important the feature is or how loud the reviewer was.
 
-| Recommend | When the step is… |
-|---|---|
-| `haiku` (Haiku 4.5) | Mechanical and fully specified by the plan: renames, boilerplate, config edits, adding a test that mirrors an existing one, applying a pattern already present in the codebase, single-file changes with an obvious diff. |
-| `sonnet` (Sonnet 5) | Typical feature work: 2–5 files, clear requirements, established patterns, moderate debugging. The default for most steps. |
-| `opus` (Opus 5) | Cross-cutting or ambiguous: architectural changes, tricky concurrency/state, unfamiliar or undocumented code, steps where the plan itself lists open questions, debugging with no clear cause. |
-| `fable` (Fable 5) | Only if the step is genuinely hard *and* the cost of getting it wrong is high (data migrations, security-sensitive logic, subtle correctness). Say explicitly why opus isn't enough. |
+### Tier → model mapping
+
+Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Names as of early 2026 — verify against the provider's current list if unsure.
+
+| Tier | Use for | Claude | OpenAI | Google |
+|---|---|---|---|---|
+| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | Haiku 4.5 | GPT-5 mini / GPT-5 nano | Gemini 2.5 Flash-Lite |
+| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | Sonnet 5 | GPT-5 / GPT-5.1 | Gemini 2.5 Flash |
+| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | Opus 5 | GPT-5 / GPT-5.1 (high reasoning) or GPT-5-Codex | Gemini 2.5 Pro / Gemini 3 Pro |
+| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | Fable 5 | GPT-5.1 Pro / o3-pro | Gemini 3 Pro (Deep Think) |
 
 Rules:
-- Default to `sonnet` overall unless the steps are mostly mechanical (→ `haiku`) or mostly ambiguous (→ `opus`).
-- When steps vary, give the per-step split so the user can run the cheap steps on a cheap model and switch only for the hard ones. A well-written plan *lowers* the model needed — if a step needs `opus` mainly because the plan is vague, tighten the step instead.
-- If the whole plan is small and mechanical, say so plainly: "`haiku` for everything."
-
-Keep it tight — a plan the user can read in a couple of minutes. Prefer specific file paths and function names over generic advice. Flag any assumption you made in "Risks & open questions" rather than silently deciding.
+- Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
+- When steps vary, give the per-step split so the user can run cheap parts on a cheap model and switch only for the hard ones.
+- A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
+- If the whole plan is small and mechanical, say so plainly: "small for everything."
 
 ## Ending your turn
 
