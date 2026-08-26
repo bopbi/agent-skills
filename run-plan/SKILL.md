@@ -1,0 +1,63 @@
+---
+name: run-plan
+description: [personal] Execute a plan file from the repo's plan/ directory (written by /plan-task or /pr-triage) step by step, run its Verification section, and record the outcome back into the plan. Use when the user says "run the plan", "execute the plan", "implement plan/<file>", or "do the plan" — optionally naming a file; defaults to the newest draft in plan/. Checks the plan's model-tier recommendation against the current model before starting. Does not commit, push, or touch GitHub unless asked.
+metadata:
+  author: Bobby Prabowo (bopbi)
+  origin: personal
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Agent(Explore)
+---
+# Run plan — execute a plan file, then close the loop
+
+The plan was written deliberately (via `/plan-task` or `/pr-triage`) so that execution can run on a cheaper model with less context. Your job is to **follow it**, not to re-plan it.
+
+## Step 0 — Locate and load the plan
+
+- `$ARGUMENTS` may name a file (`plan/2026-08-26-foo.md` or just `foo`) — match it under `plan/`. Otherwise pick the newest `plan/*.md` whose `Status:` is `draft` or `in-progress`. If none, say so and stop.
+- Read the whole plan. Also run `git status --short` — if the working tree has unrelated uncommitted changes, say so and ask whether to continue (they could be mixed into this work).
+- If `Status: done`, stop and say so unless the user explicitly wants a re-run.
+
+## Step 1 — Preflight (answer these in your reply before editing anything)
+
+1. **Decisions pending?** If the plan has a non-empty "Needs your decision" section that the user hasn't answered (in the plan or in this conversation), list the items and **stop** — executing on a guess defeats the point of planning. If the user says "use your judgment", record the choice you make in the plan's log.
+2. **Model tier.** Compare the plan's `Overall tier` / `Concrete model` against the model you are running as. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier than recommended for the overall plan or for a specific step/cluster, say so and ask whether to continue anyway or switch (`/model <name>`) — do not silently proceed on a step the plan flagged as needing more.
+3. **Scope.** State the steps you will execute and the files they touch, from the plan. Nothing else.
+
+Then set the plan's `Status:` to `in-progress`.
+
+## Step 2 — Execute, in the plan's order
+
+- Do each step as written. Read the files it names; keep them loaded across steps that share them.
+- If a step's premise is wrong (the code has changed, the symbol doesn't exist, the step would break something the plan didn't foresee), **do not improvise a redesign**. Do the smallest correct thing, and record the deviation in the log. If the deviation is material (changes the approach, touches files outside the plan's scope), stop and ask.
+- Stay inside the plan's scope and non-goals. No opportunistic refactors, no "while I'm here".
+- For `/pr-triage` plans: implement ✅ and ⚠️ clusters only. Do **not** reply to, resolve, or otherwise touch GitHub threads — that is a separate, explicit step for the user.
+
+## Step 3 — Verify
+
+Run everything in the plan's "Verification" section (tests, lint, typecheck, manual checks). Report results honestly, including failures — do not mark a step done if its verification failed. If a test fails because of the plan's own design rather than your implementation, say so and stop rather than patching around it.
+
+## Step 4 — Close the loop in the plan file
+
+Edit the plan file (only inside `plan/`):
+- `Status:` → `done` if every step passed verification, otherwise `blocked` with a one-line reason.
+- Append an `## Execution log` section:
+
+```markdown
+## Execution log
+- **Executed:** <YYYY-MM-DD> on <model you ran as>
+- **Steps:** 1 ✅, 2 ✅, 3 ⚠️ deviated (<why>), 4 ⏭ skipped (<why>)
+- **Verification:** <commands run and results>
+- **Deviations / decisions made:** <bullets, or "none">
+- **Follow-ups:** <anything discovered that is out of scope, or "none">
+```
+
+## What this skill does NOT do
+
+- No `git commit` / `git push` unless the user asks (the `commit-commands` plugin or `/commit` covers that).
+- No GitHub replies or thread resolution.
+- No re-planning. If the plan is wrong enough that you'd need to redesign, stop and say so — the fix is a new `/plan-task`, not a silent rewrite.
+
+## Ending your turn
+
+Reply with: plan file path and final status, the step summary line, verification results, deviations, and any follow-ups or blockers. Do not offer to commit.
+
+$ARGUMENTS
