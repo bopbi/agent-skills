@@ -1,6 +1,6 @@
 ---
 name: pr-resolve
-description: [personal] Post replies to PR review threads and resolve them according to an executed /pr-triage plan. Use after /run-plan has finished a pr-<n>-review plan and the fix is pushed — when the user says "resolve the PR comments", "reply to reviewers", "close the review threads". Previews every reply and asks for confirmation before posting. Fixed threads get "fixed in <sha>" + resolved; not-valid and question threads get the plan's drafted reply but stay open for the reviewer.
+description: Post replies to PR review threads and resolve them according to an executed /pr-triage plan. Use after /run-plan has finished a pr-<n>-review plan and the fix is pushed — when the user says "resolve the PR comments", "reply to reviewers", "close the review threads". Previews every reply and asks for confirmation before posting. Fixed threads get "fixed in <sha>" + resolved; not-valid and question threads get the plan's drafted reply but stay open for the reviewer.
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal

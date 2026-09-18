@@ -1,6 +1,6 @@
 ---
 name: ask
-description: [personal] Read-only exploration and Q&A about the current repo/directory. Use when the user wants to understand, explore, or ask questions about code BEFORE deciding on any plan — no file changes, no proposed edits, no offers to implement. Triggers on "/ask", "just explain", "just tell me", "explore before planning", "don't change anything".
+description: Read-only exploration and Q&A about the current repo/directory. Use when the user wants to understand, explore, or ask questions about code BEFORE deciding on any plan — no file changes, no proposed edits, no offers to implement. Triggers on "/ask", "just explain", "just tell me", "explore before planning", "don't change anything".
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal

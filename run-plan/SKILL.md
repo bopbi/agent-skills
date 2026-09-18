@@ -1,6 +1,6 @@
 ---
 name: run-plan
-description: [personal] Execute a plan file from the repo's plan/ directory (written by /plan-task or /pr-triage) step by step, run its Verification section, and record the outcome back into the plan. Use when the user says "run the plan", "execute the plan", "implement plan/<file>", or "do the plan" — optionally naming a file; defaults to the newest draft in plan/. Checks the plan's model-tier recommendation against the current model before starting. Does not commit, push, or touch GitHub unless asked.
+description: Execute a plan file from the repo's plan/ directory (written by /plan-task or /pr-triage) step by step, run its Verification section, and record the outcome back into the plan. Use when the user says "run the plan", "execute the plan", "implement plan/<file>", or "do the plan" — optionally naming a file; defaults to the newest draft in plan/. Checks the plan's model-tier recommendation against the current model before starting. Does not commit, push, or touch GitHub unless asked.
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal

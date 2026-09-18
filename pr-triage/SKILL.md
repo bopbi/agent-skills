@@ -1,6 +1,6 @@
 ---
 name: pr-triage
-description: [personal] Triage ALL review comments on a GitHub PR and write a plan file (plan/<date>-pr-<n>-review.md) — no code changes. Fetches every inline thread, review summary, and conversation comment, judges whether each comment is valid against the actual code, groups them by common theme (not by order), and writes a resolution plan with a model recommendation. Use when the user says "plan the PR comments", "triage review feedback", "check if the reviewer is right", or runs it on a branch that has an open PR after pushing. Run with no arguments from the PR branch; a PR number is optional. Never edits code, never replies, never commits.
+description: Triage ALL review comments on a GitHub PR and write a plan file (plan/<date>-pr-<n>-review.md) — no code changes. Fetches every inline thread, review summary, and conversation comment, judges whether each comment is valid against the actual code, groups them by common theme (not by order), and writes a resolution plan with a model recommendation. Use when the user says "plan the PR comments", "triage review feedback", "check if the reviewer is right", or runs it on a branch that has an open PR after pushing. Run with no arguments from the PR branch; a PR number is optional. Never edits code, never replies, never commits.
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal

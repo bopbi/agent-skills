@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: [personal] Write an implementation plan as a markdown file in the repo's plan/ directory (plan/<date>-<slug>.md) and stop — no code changes. Use after exploring with /ask, or when the user says "write a plan file", "plan this out into a file", "make a plan md", "draft the plan for". Distinct from the built-in interactive plan mode: this writes a file and stops. Reads the codebase to ground the plan in real files, but only ever writes inside plan/. Never touches .gitignore and never stages or commits the plan file.
+description: Write an implementation plan as a markdown file in the repo's plan/ directory (plan/<date>-<slug>.md) and stop — no code changes. Use after exploring with /ask, or when the user says "write a plan file", "plan this out into a file", "make a plan md", "draft the plan for". Distinct from the built-in interactive plan mode — this writes a file and stops. Reads the codebase to ground the plan in real files, but only ever writes inside plan/. Never touches .gitignore and never stages or commits the plan file.
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal
