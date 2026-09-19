@@ -1,5 +1,11 @@
 # Repository instructions for agents
 
+## Publishing releases
+
+Follow `RELEASING.md` for every release publication. It defines the required
+rolling-release contract, validation, recovery behavior, and post-publication
+checks; do not substitute ad-hoc GitHub release commands.
+
 ## Model-tier policy
 
 `MODEL_TIERS.md` is the only hand-edited source for model tiers, provider/model
