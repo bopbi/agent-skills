@@ -29,14 +29,18 @@ echo "Installing agent-skills skills..."
 SOURCE_ROOT=""
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 if [ -n "$SELF_DIR" ] && [ -f "$SELF_DIR/ask/SKILL.md" ]; then
+  if [ ! -f "$SELF_DIR/MODEL_TIERS.md" ]; then
+    echo "error: model-tier policy not found beside local skills" >&2
+    exit 1
+  fi
   SOURCE_ROOT="$SELF_DIR"
 else
   command -v curl >/dev/null 2>&1 || { echo "error: curl is required to fetch the skills tarball" >&2; exit 1; }
   command -v tar  >/dev/null 2>&1 || { echo "error: tar is required to unpack the skills tarball" >&2; exit 1; }
   WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-install.XXXXXX")"
   curl -fsSL "$TARBALL_URL" | tar -xz --strip-components 1 -C "$WORK_DIR"
-  if [ ! -f "$WORK_DIR/ask/SKILL.md" ]; then
-    echo "error: skills not found after unpacking (is $TARBALL_URL valid?)" >&2
+  if [ ! -f "$WORK_DIR/ask/SKILL.md" ] || [ ! -f "$WORK_DIR/MODEL_TIERS.md" ]; then
+    echo "error: skills or model-tier policy not found after unpacking (is $TARBALL_URL valid?)" >&2
     exit 1
   fi
   SOURCE_ROOT="$WORK_DIR"
@@ -96,6 +100,8 @@ for entry in $PROVIDERS; do
   [ "$detected" -eq 1 ] || continue
   skills_dir="$agent_home/skills"
   mkdir -p "$skills_dir"
+  cp -p "$SOURCE_ROOT/MODEL_TIERS.md" "$skills_dir/MODEL_TIERS.md"
+  echo "Model tier policy installed to $skills_dir/MODEL_TIERS.md"
   for skill_name in $skills; do
     cp -Rp "$SOURCE_ROOT/$skill_name" "$skills_dir/"
     echo "Skill '$skill_name' installed to $skills_dir/$skill_name"

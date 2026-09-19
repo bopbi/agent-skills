@@ -17,13 +17,17 @@ echo "Installing agent-skills skills..."
 SOURCE_ROOT=""
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 if [ -n "$SELF_DIR" ] && [ -f "$SELF_DIR/ask/SKILL.md" ]; then
+  if [ ! -f "$SELF_DIR/MODEL_TIERS.md" ]; then
+    echo "error: model-tier policy not found beside local skills" >&2
+    exit 1
+  fi
   SOURCE_ROOT="$SELF_DIR"
 else
   command -v git >/dev/null 2>&1 || { echo "error: git is required to fetch the skills repo" >&2; exit 1; }
   WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-install.XXXXXX")"
   git clone --depth 1 "$REPO_URL" "$WORK_DIR/repo"
-  if [ ! -f "$WORK_DIR/repo/ask/SKILL.md" ]; then
-    echo "error: skills not found after cloning (is $REPO_URL valid?)" >&2
+  if [ ! -f "$WORK_DIR/repo/ask/SKILL.md" ] || [ ! -f "$WORK_DIR/repo/MODEL_TIERS.md" ]; then
+    echo "error: skills or model-tier policy not found after cloning (is $REPO_URL valid?)" >&2
     exit 1
   fi
   SOURCE_ROOT="$WORK_DIR/repo"
@@ -81,6 +85,8 @@ for entry in $PROVIDERS; do
   [ "$detected" -eq 1 ] || continue
   skills_dir="$agent_home/skills"
   mkdir -p "$skills_dir"
+  cp -p "$SOURCE_ROOT/MODEL_TIERS.md" "$skills_dir/MODEL_TIERS.md"
+  echo "Model tier policy installed to $skills_dir/MODEL_TIERS.md"
   for skill_name in $skills; do
     cp -Rp "$SOURCE_ROOT/$skill_name" "$skills_dir/"
     echo "Skill '$skill_name' installed to $skills_dir/$skill_name"

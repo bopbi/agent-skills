@@ -45,22 +45,40 @@ Or clone the repo and run `./install.sh`. For a git-based one-liner, use:
 curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install-git.sh | bash
 ```
 
-Either way, the script copies the skills into every agent it finds (`~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`, `~/.gemini/config/skills/`, `~/.qwen/skills/`, `~/.config/opencode/skills/`): skills already there are left alone, same-named ones are merged over, and re-running updates the copies. The `install-git.sh` variant requires git.
+Either way, the script copies the skills and their shared `MODEL_TIERS.md` policy into every agent it finds (`~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`, `~/.gemini/config/skills/`, `~/.qwen/skills/`, `~/.config/opencode/skills/`): skills already there are left alone, same-named ones are merged over, and re-running updates the copies. The `install-git.sh` variant requires git.
 
 `/pr-triage` and `/pr-resolve` need the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and `jq`.
 
 ## Model recommendation rubric
 
-Plans recommend a **tier** — the cheapest one that can reliably execute each step — judged by **ambiguity and blast radius**, not by feature importance. Each plan also emits a **compatible model range**: one model from every supported provider for that tier. The tier is the requirement, not the provider that made the plan, so execution may switch providers when the selected model is listed for or verified above the required tier.
+Model-tier data is generated from the canonical `MODEL_TIERS.md`. To update it,
+edit that file, run `scripts/sync-model-tiers.sh`, and confirm
+`scripts/sync-model-tiers.sh --check` passes.
+
+<!-- BEGIN GENERATED MODEL-TIER POLICY -->
+**Policy source:** This block is generated from `MODEL_TIERS.md`; do not edit
+it in this consumer.
+
+Plans recommend the cheapest **tier** that can reliably execute each step or
+cluster, judged by ambiguity and blast radius rather than feature importance.
+Every recommendation also emits a **compatible model range**: one model from
+each supported provider at that tier. The tier is the requirement, not the
+provider that created the plan, so execution may switch providers when the
+selected model is listed for, or verified above, the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
 | small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.6` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
 | standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.7-code` | `qwen3.7-plus` | `grok-4.3` |
 | large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` | `qwen3.8-max` | `grok-4.6` |
-| frontier | genuinely hard *and* costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
+| frontier | genuinely hard and costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
-Model IDs are current as of September 2026; update the table in each `SKILL.md` together as providers ship new ones. Before execution, select any compatible provider/model from the plan's range using that tool's model selector, then run `/run-plan`; it will warn before running below the required tier.
+Model IDs are current as of **September 2026**. Providers ship often, so
+verify current availability before relying on an exact ID. Default to
+**standard** unless work is fully mechanical (small) or cross-cutting or
+ambiguous (large); use frontier only when large is insufficient and mistakes
+would be unusually costly.
+<!-- END GENERATED MODEL-TIER POLICY -->
 
 ## License
 

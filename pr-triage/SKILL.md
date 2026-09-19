@@ -107,8 +107,8 @@ Tests/lint/typecheck to run for the touched areas; any test that should be added
 
 ## Model recommendation
 - **Overall tier:** <small | standard | large | frontier> — one sentence why.
-- **Compatible model range:** Claude `<model>`; OpenAI/GitHub Copilot `<model>`; Google `<model>`; Kimi `<model>`; Qwen `<model>`; Grok `<model>`. List the entry for every supported provider from the row matching the overall tier.
-- **Per cluster (only where it differs):** e.g. "Error handling → large — compatible model range: Claude `<model>`; OpenAI/GitHub Copilot `<model>`; …"
+- **Compatible model range:** List every provider/model entry from the canonical policy row matching the overall tier.
+- **Per cluster (only where it differs):** e.g. "Error handling → large — compatible model range: list every provider/model entry from the matching row."
 - **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
 ```
 
@@ -118,17 +118,37 @@ The user wants to conserve spend. Recommend the **cheapest tier that can reliabl
 
 ### Tier → model mapping
 
-Choose the **tier first**, then emit the **compatible model range** by listing every provider/model entry from the matching row. The recommendation must be provider-neutral: do not privilege the provider or model used to create the plan. Model IDs are current as of **September 2026** and verified against provider documentation. Providers ship often — verify against the current model list before relying on an exact name.
+Before recommending a model, read the canonical policy at `../MODEL_TIERS.md`.
+Choose the tier first, then emit every provider/model entry from its matching row
+as the compatible model range. Do not privilege the provider or model used to
+create the plan.
+
+<!-- BEGIN GENERATED MODEL-TIER POLICY -->
+**Policy source:** This block is generated from `MODEL_TIERS.md`; do not edit
+it in this consumer.
+
+Plans recommend the cheapest **tier** that can reliably execute each step or
+cluster, judged by ambiguity and blast radius rather than feature importance.
+Every recommendation also emits a **compatible model range**: one model from
+each supported provider at that tier. The tier is the requirement, not the
+provider that created the plan, so execution may switch providers when the
+selected model is listed for, or verified above, the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.6` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
-| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.7-code` | `qwen3.7-plus` | `grok-4.3` |
-| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | `claude-opus-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` | `qwen3.8-max` | `grok-4.6` |
-| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
+| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.6` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.7-code` | `qwen3.7-plus` | `grok-4.3` |
+| large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` | `qwen3.8-max` | `grok-4.6` |
+| frontier | genuinely hard and costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
+
+Model IDs are current as of **September 2026**. Providers ship often, so
+verify current availability before relying on an exact ID. Default to
+**standard** unless work is fully mechanical (small) or cross-cutting or
+ambiguous (large); use frontier only when large is insufficient and mistakes
+would be unusually costly.
+<!-- END GENERATED MODEL-TIER POLICY -->
 
 Rules:
-- Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
 - When clusters vary, give the per-cluster split so the user can run cheap parts on a cheap model and switch only for the hard ones.
 - A user may switch providers between planning and execution if the execution model is listed for, or is verified above, the required tier.
 - A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
