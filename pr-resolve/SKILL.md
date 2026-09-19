@@ -4,7 +4,7 @@ description: Post replies to PR review threads and resolve them according to an 
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal
-allowed-tools: Read, Grep, Glob, Edit(plan/**), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/reply-thread.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/../pr-triage/scripts/fetch-comments.sh *), Bash(gh pr view:*), Bash(gh api graphql *), Bash(git status:*), Bash(git log:*), Bash(git rev-parse:*), Bash(git branch:*), Bash(cat:*), Bash(ls:*), Bash(date:*)
+allowed-tools: Read, Grep, Glob, Edit(plan/**), Bash(bash */scripts/reply-thread.sh *), Bash(bash */pr-triage/scripts/fetch-comments.sh *), Bash(gh pr view:*), Bash(gh api graphql *), Bash(git status:*), Bash(git log:*), Bash(git rev-parse:*), Bash(git branch:*), Bash(cat:*), Bash(ls:*), Bash(date:*)
 ---
 # PR resolve — close the loop with reviewers, from the plan
 
@@ -16,7 +16,9 @@ This is the only skill in the set that **writes to GitHub**. It posts nothing wi
 2. Find the matching plan: newest `plan/*-pr-<n>-review.md`. Stop if none — run `/pr-triage` first.
 3. Read the plan. Require an `## Execution log` (i.e. `/run-plan` has run). If `Status:` is not `done`, list what's incomplete and stop — never resolve a thread whose fix isn't finished.
 4. Confirm the fix is **pushed**: local `git rev-parse HEAD` must equal the PR's `headRefOid`, and `git status --short --branch` must show nothing ahead/uncommitted. If not, stop and say what needs pushing. Reviewers must be able to see the change before its thread is resolved.
-5. Re-fetch threads to get current state: `bash ${CLAUDE_SKILL_DIR}/../pr-triage/scripts/fetch-comments.sh --all`. Skip any thread already resolved by someone else.
+5. Re-fetch threads to get current state: `bash <skill-dir>/../pr-triage/scripts/fetch-comments.sh --all`. Skip any thread already resolved by someone else.
+
+`<skill-dir>` is the directory containing this SKILL.md — resolve it from the path your agent loaded this skill from (e.g. `~/.claude/skills/pr-resolve`). `pr-triage` is expected as a sibling install (guaranteed by `install.sh`).
 
 ## Step 1 — Build the reply list from the plan's verdicts
 
@@ -40,7 +42,7 @@ Print the full table — thread, `path:line`, verdict, reply text verbatim, reso
 For each confirmed row:
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/reply-thread.sh <thread_id> "<reply>" [--resolve]
+bash <skill-dir>/scripts/reply-thread.sh <thread_id> "<reply>" [--resolve]
 ```
 
 Post one thread at a time; if one fails, report it and continue with the rest, then list failures at the end. Never resolve a thread you didn't reply to (a silent resolve looks dismissive).

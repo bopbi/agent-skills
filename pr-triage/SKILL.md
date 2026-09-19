@@ -4,7 +4,7 @@ description: Triage ALL review comments on a GitHub PR and write a plan file (pl
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal
-allowed-tools: Read, Grep, Glob, Write(plan/**), Edit(plan/**), Bash(mkdir -p plan:*), Bash(date:*), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/fetch-comments.sh *), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh api:*), Bash(cat:*), Bash(head:*), Bash(tail:*), Bash(sed -n:*), Bash(ls:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(wc:*), Bash(tree:*), Bash(git status:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(git blame:*), Bash(git branch:*), Bash(git rev-parse:*), Agent(Explore)
+allowed-tools: Read, Grep, Glob, Write(plan/**), Edit(plan/**), Bash(mkdir -p plan:*), Bash(date:*), Bash(bash */scripts/fetch-comments.sh *), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh api:*), Bash(cat:*), Bash(head:*), Bash(tail:*), Bash(sed -n:*), Bash(ls:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(wc:*), Bash(tree:*), Bash(git status:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(git blame:*), Bash(git branch:*), Bash(git rev-parse:*), Agent(Explore)
 ---
 # Plan PR review — read everything, judge it, write the plan, change nothing
 
@@ -35,8 +35,10 @@ git rev-parse HEAD && git status --short --branch
 ## Step 1 — Fetch everything (one command)
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/fetch-comments.sh [--all]
+bash <skill-dir>/scripts/fetch-comments.sh [--all]
 ```
+
+`<skill-dir>` is the directory containing this SKILL.md — resolve it from the path your agent loaded this skill from (e.g. `~/.claude/skills/pr-triage`).
 
 (Uses the current branch's PR; pass a number first only if the user gave one.)
 

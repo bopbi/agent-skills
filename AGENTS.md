@@ -28,3 +28,17 @@ still direct agents to emit every provider listed in the canonical row.
 Never hand-edit text between `BEGIN GENERATED MODEL-TIER POLICY` and
 `END GENERATED MODEL-TIER POLICY` in a consumer. Edit the canonical source and
 regenerate it instead.
+
+## Skill portability
+
+Skills in this repo install into multiple coding agents (Claude Code, Kimi
+Code, Cursor, Gemini CLI, Qwen Code, opencode), so SKILL.md bodies must stay
+agent-neutral:
+
+- Refer to the skill's own directory as `<skill-dir>` (the directory
+  containing the SKILL.md, resolved from the path the agent loaded it from).
+  Never use `${CLAUDE_SKILL_DIR}` or any other agent-specific variable.
+- `allowed-tools` frontmatter is enforced only on agents that support it
+  (Claude Code); elsewhere the restrictions are prompt-level. Keep each
+  skill's "Hard rules" section self-sufficient — it must hold even when
+  nothing enforces it.

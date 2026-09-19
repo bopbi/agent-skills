@@ -1,6 +1,6 @@
-# Claude Code skills
+# Agent skills
 
-Personal [Claude Code](https://claude.com/claude-code) skills built around one idea:
+Personal skills for coding agents ([Claude Code](https://claude.com/claude-code), [Kimi Code](https://github.com/MoonshotAI/kimi-code), [Cursor](https://cursor.com), [Gemini CLI](https://github.com/google-gemini/gemini-cli), [Qwen Code](https://github.com/QwenLM/qwen-code), [opencode](https://opencode.ai)) built around one idea:
 **separate exploring, planning, and executing** so each step runs on the cheapest model that can do it.
 
 ```
@@ -31,7 +31,7 @@ Plans separate three kinds of uncertainty:
 
 `/run-plan` has a hard gate: it refuses to start while any `→ Decision:` line is blank, and won't accept "use your judgment". Answer in the file (you're reading it in your editor anyway) or in chat — it writes your answer into the file and proceeds. This keeps decisions with the model that had the full context, and keeps the cheap executor from guessing.
 
-Each skill is restricted through `allowed-tools` in its frontmatter, so the "read-only" / "only writes to `plan/`" guarantees are enforced by Claude Code's permission system, not just by prompt wording.
+Each skill is restricted through `allowed-tools` in its frontmatter, so on agents that enforce that frontmatter the "read-only" / "only writes to `plan/`" guarantees are backed by the permission system, not just by prompt wording. On agents without frontmatter enforcement, the guarantees are prompt-level only.
 
 ## Install
 
