@@ -18,7 +18,7 @@
 set -euo pipefail
 
 # Overridable for testing or mirrors; the default tracks the default branch.
-: "${TARBALL_URL:=https://github.com/bopbi/agent-skills/releases/download/v1.0.0/agent-skills-main.tar.gz}"
+: "${TARBALL_URL:=https://github.com/bopbi/agent-skills/releases/download/v1.0.1/agent-skills-main.tar.gz}"
 
 echo "Installing agent-skills skills..."
 
