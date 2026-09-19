@@ -1,6 +1,6 @@
 ---
 name: run-plan
-description: Execute a plan file from the repo's plan/ directory (written by /plan-task or /pr-triage) step by step, run its Verification section, and record the outcome back into the plan. Use when the user says "run the plan", "execute the plan", "implement plan/<file>", or "do the plan" — optionally naming a file; defaults to the newest draft in plan/. Checks the plan's model-tier recommendation against the current model before starting. Does not commit, push, or touch GitHub unless asked.
+description: Execute a plan file from the repo's plan/ directory (written by /plan-task or /pr-triage) step by step, run its Verification section, and record the outcome back into the plan. Handles multi-file plan sets (an index file plus ordered part files) by executing parts one at a time in index order. Use when the user says "run the plan", "execute the plan", "implement plan/<file>", or "do the plan" — optionally naming a file; defaults to the newest draft in plan/. Checks the plan's model-tier recommendation against the current model before starting. Does not commit, push, or touch GitHub unless asked.
 metadata:
   author: Bobby Prabowo (bopbi)
   origin: personal
@@ -15,10 +15,11 @@ The plan was written deliberately (via `/plan-task` or `/pr-triage`) so that exe
 - `$ARGUMENTS` may name a file (`plan/2026-08-26-foo.md` or just `foo`) — match it under `plan/`. Otherwise pick the newest `plan/*.md` whose `Status:` is `draft` or `in-progress`. If none, say so and stop.
 - Read the whole plan. Also run `git status --short` — if the working tree has unrelated uncommitted changes, say so and ask whether to continue (they could be mixed into this work).
 - If `Status: done`, stop and say so unless the user explicitly wants a re-run.
+- **Multi-file plan sets.** If the located file is an index — it contains an ordered "Parts" list linking to sibling `plan/*.md` part files — load the index, state the parts and their order, and default to executing the earliest part whose `Status:` is `draft` or `in-progress` (respecting each part's "Depends on"). If the user named a part file directly, execute that part standalone. A single plan file without a Parts list is executed exactly as before.
 
 ## Step 1 — Preflight (answer these in your reply before editing anything)
 
-1. **Decisions resolved? (hard gate)** Every item under "Needs your decision" must have a filled-in `→ Decision:` line in the plan file. If any is blank, list the open items (D1, D2…) with their options and **stop**. Do not decide yourself, and do not accept "use your judgment" as an answer — the plan was written by a model with more context than you have now. Two ways the user can answer: edit the plan file directly, or tell you the answer in chat, in which case you write it into the `→ Decision:` line (that edit is allowed) and then continue. "Either — pick the simpler one" is a valid recorded decision; a blank line is not.
+1. **Decisions resolved? (hard gate)** Every item under "Needs your decision" must have a filled-in `→ Decision:` line in the plan file. When executing a part of a multi-file plan set, also check any index-level "Needs your decision" items that this part says it blocks on — they must be resolved too. If any is blank, list the open items (D1, D2…) with their options and **stop**. Do not decide yourself, and do not accept "use your judgment" as an answer — the plan was written by a model with more context than you have now. Two ways the user can answer: edit the plan file directly, or tell you the answer in chat, in which case you write it into the `→ Decision:` line (that edit is allowed) and then continue. "Either — pick the simpler one" is a valid recorded decision; a blank line is not.
    "Assumptions" are different: follow each stated default without asking, and if you find one is wrong, apply its stated fallback and note it in the log.
 2. **Model tier.** Read the canonical policy at `../MODEL_TIERS.md`, then identify the provider, model, and tier you are running as and compare that tier with the plan's `Overall tier` and any per-step/per-cluster exception. The plan's `Compatible model range` is provider-neutral: a listed model from another provider, or a verified higher-tier model, is acceptable. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier, or cannot determine your model's tier, state that plainly; show the required tier's compatible model range. For a legacy plan without a range, use the canonical policy's row for its required tier and mention its legacy `Concrete model` when present, then ask whether to continue anyway or switch with the current tool's provider-specific model selector. Do not silently proceed on a step the plan flagged as needing more.
 3. **Scope.** State the steps you will execute and the files they touch, from the plan. Nothing else.
@@ -39,7 +40,8 @@ Run everything in the plan's "Verification" section (tests, lint, typecheck, man
 ## Step 4 — Close the loop in the plan file
 
 Edit the plan file (only inside `plan/`):
-- `Status:` → `done` if every step passed verification, otherwise `blocked` with a one-line reason.
+- When executing a part of a multi-file plan set, apply everything in Steps 1–4 to that part file: preflight, execution, verification, and the execution log below. Its "Model recommendation" section (not the index's) governs the tier check, unless the part defers to the index.
+- `Status:` → `done` if every step passed verification, otherwise `blocked` with a one-line reason. For a part of a plan set, set the part's `Status:` and also note progress in the index — check off the part in the index's Parts list (e.g. `- [x]`) and append a one-line note with the date and outcome. Never edit part files other than the one being executed.
 - Append an `## Execution log` section:
 
 ```markdown
@@ -61,6 +63,6 @@ Edit the plan file (only inside `plan/`):
 
 ## Ending your turn
 
-Reply with: plan file path and final status, the step summary line, verification results, deviations, and any follow-ups or blockers. Do not offer to commit.
+Reply with: plan file path and final status, the step summary line, verification results, deviations, and any follow-ups or blockers. When a part of a multi-file plan set finished, also name the next pending part from the index (do not auto-run it). Do not offer to commit.
 
 $ARGUMENTS

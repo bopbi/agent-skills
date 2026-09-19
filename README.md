@@ -10,14 +10,16 @@ Personal skills for coding agents ([Claude Code](https://claude.com/claude-code)
 
 Plans are written as markdown into `plan/` in your repo. They are meant to be read in your editor,
 left untracked (never committed), and never gitignored — so they stay visible and navigable in the IDE.
+Large tasks may be split into an index file plus ordered part files, so each chunk is planned,
+reviewed, and executed on its own.
 
 ## Skills
 
 | Command | What it does | Writes |
 |---|---|---|
 | `/ask <question>` | Read-only exploration and Q&A. Answers with `path:line` evidence. Never edits, never offers to. | nothing |
-| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) and a compatible provider/model range. Can reuse a prior `/ask` from the same session as its Context. | `plan/<date>-<slug>.md` |
-| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Hard-stops if any `→ Decision:` line in the plan is blank, and asks if its model tier is lower than the plan requires; a matching-tier model from another provider is accepted. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
+| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) and a compatible provider/model range. Can reuse a prior `/ask` from the same session as its Context. Large or complex tasks are split into an index file plus ordered part files — the skill proposes a default breakdown and waits for your confirmation before writing anything. | `plan/<date>-<slug>.md`, or an index + `plan/<date>-<slug>-NN-<part>.md` parts for large tasks |
+| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Multi-file plan sets are executed part by part in index order — earliest draft part by default — with progress recorded back into the index. Hard-stops if any `→ Decision:` line in the plan is blank, and asks if its model tier is lower than the plan requires; a matching-tier model from another provider is accepted. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log; part progress also noted in the index) |
 | `/pr-resolve` | The only skill that writes to GitHub. After `/run-plan` finished a `pr-<n>-review` plan and the fix is pushed, builds a reply for every thread from the plan's verdicts (fixed → "Fixed in `<sha>`" + resolve; not-valid / question / out-of-scope → drafted reply, left open for the reviewer), **previews the full list and asks for confirmation**, posts, and logs the result into the plan. `--dry-run` previews only. Depends on `pr-triage/` being installed alongside it. | `plan/<file>.md` (resolution log) + GitHub replies |
 | `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a tier and compatible provider/model range. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
 
