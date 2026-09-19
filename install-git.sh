@@ -113,8 +113,10 @@ for entry in $PROVIDERS; do
   targets=$((targets + 1))
   skills_dir="$agent_home/skills"
   mkdir -p "$skills_dir"
-  cp -p "$SOURCE_ROOT/MODEL_TIERS.md" "$skills_dir/MODEL_TIERS.md"
-  print_item "Model tier policy" "$skills_dir/MODEL_TIERS.md"
+  mkdir -p "$skills_dir/model-tier-data"
+  cp -p "$SOURCE_ROOT/MODEL_TIERS.md" "$skills_dir/model-tier-data/MODEL_TIERS.md"
+  rm -f "$skills_dir/MODEL_TIERS.md"
+  print_item "Model tier policy" "$skills_dir/model-tier-data/MODEL_TIERS.md"
   for skill_name in $skills; do
     cp -Rp "$SOURCE_ROOT/$skill_name" "$skills_dir/"
     print_item "Skill '$skill_name'" "$skills_dir/$skill_name"

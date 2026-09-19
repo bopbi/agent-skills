@@ -47,7 +47,7 @@ Or clone the repo and run `./install.sh`. For a git-based one-liner, use:
 curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install-git.sh | bash
 ```
 
-Either way, the script copies the skills and their shared `MODEL_TIERS.md` policy into every agent it finds (`~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`, `~/.gemini/config/skills/`, `~/.qwen/skills/`, `~/.config/opencode/skills/`): skills already there are left alone, same-named ones are merged over, and re-running updates the copies. The `install-git.sh` variant requires git.
+Either way, the script copies the skills into every agent it finds (`~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`, `~/.gemini/config/skills/`, `~/.qwen/skills/`, `~/.config/opencode/skills/`), and copies their shared `MODEL_TIERS.md` policy into a `model-tier-data/` subdirectory inside each skills directory: skills already there are left alone, same-named ones are merged over, and re-running updates the copies. The `install-git.sh` variant requires git.
 
 `/pr-triage` and `/pr-resolve` need the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and `jq`.
 

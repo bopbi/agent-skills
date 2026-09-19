@@ -120,7 +120,7 @@ The user wants to conserve spend. Recommend the **cheapest tier that can reliabl
 
 ### Tier → model mapping
 
-Before recommending a model, read the canonical policy at `../MODEL_TIERS.md`.
+Before recommending a model, read the canonical policy at `../model-tier-data/MODEL_TIERS.md`.
 Choose the tier first, then emit every provider/model entry from its matching row
 as the compatible model range. Do not privilege the provider or model used to
 create the plan.

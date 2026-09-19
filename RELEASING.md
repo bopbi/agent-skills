@@ -60,7 +60,8 @@ mkdir -p "$release_dir/home/.agents" "$release_dir/run"
   HOME="$release_dir/home" TARBALL_URL="file://$archive" bash < "$repo_root/install.sh"
 )
 test -f "$release_dir/home/.agents/skills/ask/SKILL.md"
-test -f "$release_dir/home/.agents/skills/MODEL_TIERS.md"
+test -f "$release_dir/home/.agents/skills/model-tier-data/MODEL_TIERS.md"
+test ! -e "$release_dir/home/.agents/skills/MODEL_TIERS.md"
 test ! -e "$release_dir/home/.agents/skills/publish-release"
 release_sha="$(git rev-parse HEAD)"
 archive_sha="$(shasum -a 256 "$archive" | awk '{print $1}')"
@@ -112,7 +113,8 @@ curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install.sh 
     HOME="$release_dir/remote-home" bash
   )
 test -f "$release_dir/remote-home/.agents/skills/ask/SKILL.md"
-test -f "$release_dir/remote-home/.agents/skills/MODEL_TIERS.md"
+test -f "$release_dir/remote-home/.agents/skills/model-tier-data/MODEL_TIERS.md"
+test ! -e "$release_dir/remote-home/.agents/skills/MODEL_TIERS.md"
 ```
 
 Report success only after every post-publication command passes. On success,
