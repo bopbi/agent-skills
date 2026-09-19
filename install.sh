@@ -28,10 +28,15 @@ print_item() {
   printf '  - %s: %s\n' "$1" "$2"
 }
 
-print_temp_notice() {
+cleanup_work_dir() {
+  local status=$?
   if [ -n "${WORK_DIR:-}" ]; then
-    printf '\nTemporary files remain: %s\n' "$WORK_DIR"
-    printf 'Remove them: rm -rf -- "%s"\n' "$WORK_DIR"
+    if [ "$status" -ne 0 ] || [ -n "${AGENT_SKILLS_KEEP:-}" ]; then
+      printf '\nTemporary files remain: %s\n' "$WORK_DIR"
+      printf 'Remove them: rm -rf -- "%s"\n' "$WORK_DIR"
+    else
+      rm -rf -- "$WORK_DIR"
+    fi
   fi
 }
 
@@ -39,8 +44,8 @@ print_phase "agent-skills installer"
 
 # --- Locate the skill source -------------------------------------------------
 # Prefer the copy next to this script (a repo checkout). When piped into bash,
-# fetch the repo tarball into a temp dir instead; the temp dir is left for
-# inspection and a cleanup command is printed when installation finishes.
+# fetch the repo tarball into a temp dir instead; the temp dir is auto-removed
+# on success, and kept on failure or when AGENT_SKILLS_KEEP=1.
 SOURCE_ROOT=""
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
 if [ -n "$SELF_DIR" ] && [ -f "$SELF_DIR/ask/SKILL.md" ]; then
@@ -57,6 +62,7 @@ else
   command -v curl >/dev/null 2>&1 || { echo "error: curl is required to fetch the skills tarball" >&2; exit 1; }
   command -v tar  >/dev/null 2>&1 || { echo "error: tar is required to unpack the skills tarball" >&2; exit 1; }
   WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-install.XXXXXX")"
+  trap cleanup_work_dir EXIT
   curl -fsSL "$TARBALL_URL" | tar -xz --strip-components 1 -C "$WORK_DIR"
   if [ ! -f "$WORK_DIR/ask/SKILL.md" ] || [ ! -f "$WORK_DIR/MODEL_TIERS.md" ]; then
     echo "error: skills or model-tier policy not found after unpacking (is $TARBALL_URL valid?)" >&2
@@ -133,7 +139,6 @@ done
 
 if [ "$installed" -eq 0 ]; then
   printf '\nNo installation performed: no supported agent directories found in %s\n' "$HOME" >&2
-  print_temp_notice
   exit 0
 fi
 
@@ -145,4 +150,3 @@ fi
 
 print_phase "Complete"
 printf 'Installed %d skills to %d detected targets.\n' "$installed" "$targets"
-print_temp_notice

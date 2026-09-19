@@ -20,10 +20,15 @@ print_item() {
   printf '  - %s: %s\n' "$1" "$2"
 }
 
-print_temp_notice() {
+cleanup_work_dir() {
+  local status=$?
   if [ -n "${WORK_DIR:-}" ]; then
-    printf '\nTemporary files remain: %s\n' "$WORK_DIR"
-    printf 'Remove them: rm -rf -- "%s"\n' "$WORK_DIR"
+    if [ "$status" -ne 0 ] || [ -n "${AGENT_SKILLS_KEEP:-}" ]; then
+      printf '\nTemporary files remain: %s\n' "$WORK_DIR"
+      printf 'Remove them: rm -rf -- "%s"\n' "$WORK_DIR"
+    else
+      rm -rf -- "$WORK_DIR"
+    fi
   fi
 }
 
@@ -44,6 +49,7 @@ else
   print_item "Source" "git repository"
   command -v git >/dev/null 2>&1 || { echo "error: git is required to fetch the skills repo" >&2; exit 1; }
   WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-install.XXXXXX")"
+  trap cleanup_work_dir EXIT
   git clone --depth 1 "$REPO_URL" "$WORK_DIR/repo"
   if [ ! -f "$WORK_DIR/repo/ask/SKILL.md" ] || [ ! -f "$WORK_DIR/repo/MODEL_TIERS.md" ]; then
     echo "error: skills or model-tier policy not found after cloning (is $REPO_URL valid?)" >&2
@@ -118,7 +124,6 @@ done
 
 if [ "$installed" -eq 0 ]; then
   printf '\nNo installation performed: no supported agent directories found in %s\n' "$HOME" >&2
-  print_temp_notice
   exit 0
 fi
 
@@ -128,4 +133,3 @@ fi
 
 print_phase "Complete"
 printf 'Installed %d skills to %d detected targets.\n' "$installed" "$targets"
-print_temp_notice
