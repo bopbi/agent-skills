@@ -36,10 +36,16 @@ Each skill is restricted through `allowed-tools` in its frontmatter, so the "rea
 ## Install
 
 ```bash
-git clone https://github.com/bopbi/agent-skills ~/.claude/skills
+curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install.sh | bash
 ```
 
-Or copy the individual skill folders into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level).
+Or clone the repo and run `./install.sh`. For a git-based one-liner, use:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install-git.sh | bash
+```
+
+Either way, the script copies the skills into every agent it finds (`~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`, `~/.gemini/config/skills/`, `~/.qwen/skills/`, `~/.config/opencode/skills/`): skills already there are left alone, same-named ones are merged over, and re-running updates the copies. The `install-git.sh` variant requires git.
 
 `/pr-triage` and `/pr-resolve` need the [GitHub CLI](https://cli.github.com/) (`gh auth login`) and `jq`.
 
