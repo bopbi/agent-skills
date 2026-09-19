@@ -101,14 +101,14 @@ The user wants to conserve spend. Recommend the **cheapest tier that can reliabl
 
 ### Tier → model mapping
 
-Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Names as of **August 2026** (checked against provider docs; entries marked *unverified* came from third-party coverage). Providers ship often — verify against the current model list before relying on an exact name.
+Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Model IDs are current as of **September 2026** and verified against provider documentation. Providers ship often — verify against the current model list before relying on an exact name.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | Haiku 4.5 | GPT-5.6 Luna | Gemini 3.5 Flash-Lite | Kimi K2.6 (cheapest current, not a small model) | qwen3.7-flash / qwen3-coder-flash | Grok Build 0.1 (beta) |
-| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | Sonnet 5 | GPT-5.6 Terra | Gemini 3.7 Flash | Kimi K2.7-Code | qwen3.7-plus / qwen3-coder-next | Grok 4.3 |
-| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | Opus 5 | GPT-5.6 Sol | Gemini 3.1 Pro (preview) | Kimi K3 | Qwen3.8-Max | Grok 4.6 |
-| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | Fable 5 | GPT-5.5 Pro | Gemini 3.1 Pro (no higher tier yet) | Kimi K3 (`kimi-k3-swarm-max`, unverified) | Qwen3.8-Max (no higher tier) | Grok 4.6 (no Heavy API model) |
+| **small** | mechanical, fully specified by the plan: renames, nits, boilerplate, tests mirroring existing ones, single-site fixes | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.6` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| **standard** | default: 2–5 files, clear requirement, established pattern, moderate debugging | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.7-code` | `qwen3.7-plus` | `grok-4.3` |
+| **large** | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code, open questions, debugging with no clear cause | `claude-opus-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` | `qwen3.8-max` | `grok-4.6` |
+| **frontier** | only if genuinely hard *and* costly to get wrong (migrations, security-sensitive logic, subtle correctness); justify why *large* isn't enough | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
 Rules:
 - Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
