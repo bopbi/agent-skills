@@ -16,10 +16,10 @@ left untracked (never committed), and never gitignored — so they stay visible 
 | Command | What it does | Writes |
 |---|---|---|
 | `/ask <question>` | Read-only exploration and Q&A. Answers with `path:line` evidence. Never edits, never offers to. | nothing |
-| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) mapped to concrete Claude / OpenAI / Google models. Can reuse a prior `/ask` from the same session as its Context. | `plan/<date>-<slug>.md` |
-| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Hard-stops if any `→ Decision:` line in the plan is blank, and asks if you're on a lower model tier than it recommends. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
+| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) and a compatible provider/model range. Can reuse a prior `/ask` from the same session as its Context. | `plan/<date>-<slug>.md` |
+| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Hard-stops if any `→ Decision:` line in the plan is blank, and asks if its model tier is lower than the plan requires; a matching-tier model from another provider is accepted. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log) |
 | `/pr-resolve` | The only skill that writes to GitHub. After `/run-plan` finished a `pr-<n>-review` plan and the fix is pushed, builds a reply for every thread from the plan's verdicts (fixed → "Fixed in `<sha>`" + resolve; not-valid / question / out-of-scope → drafted reply, left open for the reviewer), **previews the full list and asks for confirmation**, posts, and logs the result into the plan. `--dry-run` previews only. Depends on `pr-triage/` being installed alongside it. | `plan/<file>.md` (resolution log) + GitHub replies |
-| `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a model recommendation. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
+| `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a tier and compatible provider/model range. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
 
 ### Decisions are made while planning, never while executing
 
@@ -51,16 +51,16 @@ Either way, the script copies the skills into every agent it finds (`~/.claude/s
 
 ## Model recommendation rubric
 
-Plans recommend a **tier** — the cheapest one that can reliably execute each step — judged by **ambiguity and blast radius**, not by feature importance. The tier is provider-neutral; the plan then names a concrete model for whichever provider you use.
+Plans recommend a **tier** — the cheapest one that can reliably execute each step — judged by **ambiguity and blast radius**, not by feature importance. Each plan also emits a **compatible model range**: one model from every supported provider for that tier. The tier is the requirement, not the provider that made the plan, so execution may switch providers when the selected model is listed for or verified above the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | Haiku 4.5 | GPT-5.6 Luna | Gemini 3.5 Flash-Lite | Kimi K2.6 (cheapest current, not a small model) | qwen3.7-flash / qwen3-coder-flash | Grok Build 0.1 (beta) |
-| standard | default: 2–5 files, clear requirement, established pattern | Sonnet 5 | GPT-5.6 Terra | Gemini 3.7 Flash | Kimi K2.7-Code | qwen3.7-plus / qwen3-coder-next | Grok 4.3 |
-| large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | Opus 5 | GPT-5.6 Sol | Gemini 3.1 Pro (preview) | Kimi K3 | Qwen3.8-Max | Grok 4.6 |
-| frontier | genuinely hard *and* costly to get wrong | Fable 5 | GPT-5.5 Pro | Gemini 3.1 Pro (no higher tier yet) | Kimi K3 (`kimi-k3-swarm-max`, unverified) | Qwen3.8-Max (no higher tier) | Grok 4.6 (no Heavy API model) |
+| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.6` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.7-code` | `qwen3.7-plus` | `grok-4.3` |
+| large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` | `qwen3.8-max` | `grok-4.6` |
+| frontier | genuinely hard *and* costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
-Model names are as of August 2026; edit the table in each `SKILL.md` as providers ship new ones. Switch models before running (Claude Code: `/model <name>`), then `/run-plan` — it will warn if you're on a lower tier than the plan recommends.
+Model IDs are current as of September 2026; update the table in each `SKILL.md` together as providers ship new ones. Before execution, select any compatible provider/model from the plan's range using that tool's model selector, then run `/run-plan`; it will warn before running below the required tier.
 
 ## License
 

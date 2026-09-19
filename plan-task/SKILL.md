@@ -90,9 +90,9 @@ How to confirm it works: tests to run/add, manual checks, commands.
 
 ## Model recommendation
 - **Overall tier:** <small | standard | large | frontier> — one sentence why.
-- **Concrete model:** <model for the user's provider; see mapping>.
-- **Per step (only where it differs):** e.g. "Step 3 → large: cross-module refactor with unclear ownership."
-- **Switch with:** your tool's model switch (Claude Code: `/model <name>`).
+- **Compatible model range:** Claude `<model>`; OpenAI/GitHub Copilot `<model>`; Google `<model>`; Kimi `<model>`; Qwen `<model>`; Grok `<model>`. List the entry for every supported provider from the row matching the overall tier.
+- **Per step (only where it differs):** e.g. "Step 3 → large — compatible model range: Claude `<model>`; OpenAI/GitHub Copilot `<model>`; …"
+- **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
 ```
 
 ### Choosing the model recommendation
@@ -101,7 +101,7 @@ The user wants to conserve spend. Recommend the **cheapest tier that can reliabl
 
 ### Tier → model mapping
 
-Recommend a **tier**, then name the concrete model for the provider the user is on (default: the provider you are running as). Model IDs are current as of **September 2026** and verified against provider documentation. Providers ship often — verify against the current model list before relying on an exact name.
+Choose the **tier first**, then emit the **compatible model range** by listing every provider/model entry from the matching row. The recommendation must be provider-neutral: do not privilege the provider or model used to create the plan. Model IDs are current as of **September 2026** and verified against provider documentation. Providers ship often — verify against the current model list before relying on an exact name.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
@@ -113,6 +113,7 @@ Recommend a **tier**, then name the concrete model for the provider the user is 
 Rules:
 - Default to **standard** unless the work is mostly mechanical (→ small) or mostly ambiguous (→ large).
 - When steps vary, give the per-step split so the user can run cheap parts on a cheap model and switch only for the hard ones.
+- A user may switch providers between planning and execution if the execution model is listed for, or is verified above, the required tier.
 - A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
 - If the whole plan is small and mechanical, say so plainly: "small for everything."
 

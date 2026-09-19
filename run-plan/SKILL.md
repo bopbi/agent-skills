@@ -20,7 +20,7 @@ The plan was written deliberately (via `/plan-task` or `/pr-triage`) so that exe
 
 1. **Decisions resolved? (hard gate)** Every item under "Needs your decision" must have a filled-in `→ Decision:` line in the plan file. If any is blank, list the open items (D1, D2…) with their options and **stop**. Do not decide yourself, and do not accept "use your judgment" as an answer — the plan was written by a model with more context than you have now. Two ways the user can answer: edit the plan file directly, or tell you the answer in chat, in which case you write it into the `→ Decision:` line (that edit is allowed) and then continue. "Either — pick the simpler one" is a valid recorded decision; a blank line is not.
    "Assumptions" are different: follow each stated default without asking, and if you find one is wrong, apply its stated fallback and note it in the log.
-2. **Model tier.** Compare the plan's `Overall tier` / `Concrete model` against the model you are running as. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier than recommended for the overall plan or for a specific step/cluster, say so and ask whether to continue anyway or switch (`/model <name>`) — do not silently proceed on a step the plan flagged as needing more.
+2. **Model tier.** Identify the provider, model, and tier you are running as, then compare that tier with the plan's `Overall tier` and any per-step/per-cluster exception. The plan's `Compatible model range` is provider-neutral: a listed model from another provider, or a verified higher-tier model, is acceptable. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier, or cannot determine your model's tier, state that plainly; show the required tier's compatible model range (or the legacy `Concrete model` when an older plan has no range), then ask whether to continue anyway or switch with the current tool's provider-specific model selector. Do not silently proceed on a step the plan flagged as needing more.
 3. **Scope.** State the steps you will execute and the files they touch, from the plan. Nothing else.
 
 Then set the plan's `Status:` to `in-progress`.
@@ -44,7 +44,9 @@ Edit the plan file (only inside `plan/`):
 
 ```markdown
 ## Execution log
-- **Executed:** <YYYY-MM-DD> on <model you ran as>
+- **Planned tier / compatible model range:** <tier> / <range from the plan>
+- **Executed:** <YYYY-MM-DD> on <provider> / <model> (<tier>)
+- **Provider switch:** none, or <planning provider/model if known> → <execution provider/model>
 - **Steps:** 1 ✅, 2 ✅, 3 ⚠️ deviated (<why>), 4 ⏭ skipped (<why>)
 - **Verification:** <commands run and results>
 - **Deviations / decisions made:** <bullets, or "none">
