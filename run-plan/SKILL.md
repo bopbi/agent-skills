@@ -23,6 +23,16 @@ The plan was written deliberately (via `/plan-task` or `/pr-triage`) so that exe
    "Assumptions" are different: follow each stated default without asking, and if you find one is wrong, apply its stated fallback and note it in the log.
 2. **Model tier.** Read the canonical policy at `../model-tier-data/MODEL_TIERS.md`, then identify the provider, model, and tier you are running as and compare that tier with the plan's `Overall tier` and any per-step/per-cluster exception. The plan's `Compatible model range` is provider-neutral: a listed model from another provider, or a verified higher-tier model, is acceptable. If you are a *higher* tier than recommended, note it in one line (spending more than needed) and continue. If you are a *lower* tier, or cannot determine your model's tier, state that plainly; show the required tier's compatible model range. For a legacy plan without a range, use the canonical policy's row for its required tier and mention its legacy `Concrete model` when present, then ask whether to continue anyway or switch with the current tool's provider-specific model selector. Do not silently proceed on a step the plan flagged as needing more.
 3. **Scope.** State the steps you will execute and the files they touch, from the plan. Nothing else.
+4. **Implementation quality.** For a behavior-changing plan, require an
+   **Implementation quality** section that identifies responsibility and
+   integration, reuse or a justified boundary, and observable behavior covered
+   by focused tests. Treat this as a hard gate: if the plan is missing or vague
+   enough that you would have to choose its design or test strategy, stop for a
+   fresh `/plan-task` plan rather than inventing it. A legacy plan without this
+   section may proceed only when its scope is plainly fully mechanical (such
+   as documentation, formatting, or a direct rename); state why the contract
+   is not applicable in the execution log. Do not treat a short file list,
+   convenient injection, or a passing test as proof of maintainability.
 
 Then set the plan's `Status:` to `in-progress`.
 
@@ -31,11 +41,16 @@ Then set the plan's `Status:` to `in-progress`.
 - Do each step as written. Read the files it names; keep them loaded across steps that share them.
 - If a step's premise is wrong (the code has changed, the symbol doesn't exist, the step would break something the plan didn't foresee), **do not improvise a redesign**. Do the smallest correct thing, and record the deviation in the log. If the deviation is material (changes the approach, touches files outside the plan's scope), stop and ask.
 - Stay inside the plan's scope and non-goals. No opportunistic refactors, no "while I'm here".
+- Follow the plan's **Implementation quality** contract and the repository's
+  existing patterns. Keep each change at its stated responsibility boundary;
+  do not add an interface, wrapper, injection layer, or abstraction unless the
+  contract identifies the real collaborator or duplication it addresses. Do
+  not duplicate behavior when the contract identifies reusable code.
 - For `/pr-triage` plans: implement ✅ and ⚠️ clusters only. Do **not** reply to, resolve, or otherwise touch GitHub threads — that is a separate, explicit step for the user.
 
 ## Step 3 — Verify
 
-Run everything in the plan's "Verification" section (tests, lint, typecheck, manual checks). Report results honestly, including failures — do not mark a step done if its verification failed. If a test fails because of the plan's own design rather than your implementation, say so and stop rather than patching around it.
+Run everything in the plan's "Verification" section (tests, lint, typecheck, manual checks). Report results honestly, including failures — do not mark a step done if its verification failed. If a test fails because of the plan's own design rather than your implementation, say so and stop rather than patching around it. Before marking the plan done, review the changed code against its **Implementation quality** contract: confirm focused tests cover the stated behavior, each change remains at the intended responsibility boundary, and any seam or extraction is justified. Block rather than silently accepting a failed quality review.
 
 ## Step 4 — Close the loop in the plan file
 
@@ -51,6 +66,7 @@ Edit the plan file (only inside `plan/`):
 - **Provider switch:** none, or <planning provider/model if known> → <execution provider/model>
 - **Steps:** 1 ✅, 2 ✅, 3 ⚠️ deviated (<why>), 4 ⏭ skipped (<why>)
 - **Verification:** <commands run and results>
+- **Quality review:** <contract checks and outcome, or why they were not applicable>
 - **Deviations / decisions made:** <bullets, or "none">
 - **Follow-ups:** <anything discovered that is out of scope, or "none">
 ```

@@ -18,8 +18,8 @@ reviewed, and executed on its own.
 | Command | What it does | Writes |
 |---|---|---|
 | `/ask <question>` | Read-only exploration and Q&A. Answers with `path:line` evidence. Never edits, never offers to. | nothing |
-| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with a per-step **model tier recommendation** (small / standard / large / frontier) and a compatible provider/model range. Can reuse a prior `/ask` from the same session as its Context. Large or complex tasks are split into an index file plus ordered part files — the skill proposes a default breakdown and waits for your confirmation before writing anything. | `plan/<date>-<slug>.md`, or an index + `plan/<date>-<slug>-NN-<part>.md` parts for large tasks |
-| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Multi-file plan sets are executed part by part in index order — earliest draft part by default — with progress recorded back into the index. Hard-stops if any `→ Decision:` line in the plan is blank, and asks if its model tier is lower than the plan requires; a matching-tier model from another provider is accepted. Runs the plan's Verification section, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log; part progress also noted in the index) |
+| `/plan-task <goal>` | Writes an implementation plan grounded in the real code, with an **Implementation quality** contract for behavior-changing work plus a per-step **model tier recommendation** (small / standard / large / frontier) and compatible provider/model range. Can reuse a prior `/ask` from the same session as its Context. Large or complex tasks are split into an index file plus ordered part files — the skill proposes a default breakdown and waits for your confirmation before writing anything. | `plan/<date>-<slug>.md`, or an index + `plan/<date>-<slug>-NN-<part>.md` parts for large tasks |
+| `/run-plan [file]` | Executes a plan from `plan/` step by step (newest draft by default). Multi-file plan sets are executed part by part in index order — earliest draft part by default — with progress recorded back into the index. Hard-stops if decisions are blank, its model tier is too low, or a behavior-changing plan lacks a concrete implementation-quality contract. Runs the plan's verification and quality review, then writes `Status:` and an execution log back into the plan file. Never commits or touches GitHub. | `plan/<file>.md` (status + log; part progress also noted in the index) |
 | `/pr-resolve` | The only skill that writes to GitHub. After `/run-plan` finished a `pr-<n>-review` plan and the fix is pushed, builds a reply for every thread from the plan's verdicts (fixed → "Fixed in `<sha>`" + resolve; not-valid / question / out-of-scope → drafted reply, left open for the reviewer), **previews the full list and asks for confirmation**, posts, and logs the result into the plan. `--dry-run` previews only. Depends on `pr-triage/` being installed alongside it. | `plan/<file>.md` (resolution log) + GitHub replies |
 | `/pr-triage` | Run from a branch with an open PR. Fetches **all** review feedback in one call, judges each comment's validity against the code (valid / partial / not valid / question / out of scope), clusters by root cause regardless of order, and writes a resolution plan with a tier and compatible provider/model range. Never edits code, replies, or resolves threads. | `plan/<date>-pr-<n>-review.md` |
 | `/agents-init` | Initialize or convert a project's agent guide files. Creates a canonical `AGENTS.md` and relative symlinks for `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, and `.github/copilot-instructions.md` so the project works with Claude, Gemini, Copilot, and other agents. | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.github/copilot-instructions.md` |
@@ -33,6 +33,16 @@ Plans separate three kinds of uncertainty:
 - **Execution-time unknowns** — written as conditional steps, never as questions.
 
 `/run-plan` has a hard gate: it refuses to start while any `→ Decision:` line is blank, and won't accept "use your judgment". Answer in the file (you're reading it in your editor anyway) or in chat — it writes your answer into the file and proceeds. This keeps decisions with the model that had the full context, and keeps the cheap executor from guessing.
+
+### Implementation quality is planned, not improvised
+
+For behavior-changing work, `/plan-task` and `/pr-triage` record the behavior's
+owner, the existing pattern to reuse, any boundary or test seam that is
+actually justified, and behavior-focused tests. `/run-plan` treats that
+contract as a hard gate and reviews the result against it before marking the
+plan done. This avoids both shortcut injection and ceremonial “SOLID/DRY”
+abstractions: fully mechanical work can explicitly mark the contract not
+applicable, while a behavior-changing legacy plan without it must be replanned.
 
 Each skill is restricted through `allowed-tools` in its frontmatter, so on agents that enforce that frontmatter the "read-only" / "only writes to `plan/`" guarantees are backed by the permission system, not just by prompt wording. On agents without frontmatter enforcement, the guarantees are prompt-level only.
 
@@ -64,6 +74,10 @@ it in this consumer.
 
 Plans recommend the cheapest **tier** that can reliably execute each step or
 cluster, judged by ambiguity and blast radius rather than feature importance.
+A task is not mechanical merely because its file list is short or its intended
+outcome is clear: new production behavior, a dependency boundary or test seam,
+and non-trivial test design require at least **standard**. Reserve **small**
+for isolated, fully specified mechanical work.
 Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
@@ -71,16 +85,16 @@ selected model is listed for, or verified above, the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
-| standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
+| small | isolated, fully specified mechanical work only: renames, nits, boilerplate, mirrored tests; never new behavior, dependency seams, or test strategy | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| standard | default: 2–5 files, clear requirement, established pattern; minimum for new behavior, dependency boundaries, or non-trivial test design | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
 | large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` (long-context variant: `kimi-k3-256k`) | `qwen3.8-max` | `grok-4.6` |
 | frontier | genuinely hard and costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model; long-context variant: `kimi-k3-256k`) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
 Model IDs are current as of **September 2026**. Providers ship often, so
 verify current availability before relying on an exact ID. Default to
-**standard** unless work is fully mechanical (small) or cross-cutting or
-ambiguous (large); use frontier only when large is insufficient and mistakes
-would be unusually costly.
+**standard** unless work is isolated and fully mechanical (small), or
+cross-cutting or ambiguous (large); use frontier only when large is
+insufficient and mistakes would be unusually costly.
 <!-- END GENERATED MODEL-TIER POLICY -->
 
 ## License

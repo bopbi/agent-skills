@@ -70,6 +70,14 @@ Group threads that share a cause or pattern (same bug at multiple call sites →
 
 Path: `plan/<YYYY-MM-DD>-pr-<n>-review.md` (`date +%F`). If one already exists for this PR, update it in place and note what changed.
 
+For every valid or partially valid cluster that changes production behavior,
+populate **Implementation quality** with the owner for the behavior, relevant
+existing patterns, justified boundaries or seams, and behavior-focused tests.
+Do not use generic SOLID or DRY labels as a substitute for those facts, and do
+not prescribe interfaces or dependency injection unless a real external
+collaborator requires a seam. For mechanical clusters, state why the criteria
+are not applicable.
+
 ```markdown
 # PR #<n> review plan — <PR title>
 
@@ -92,6 +100,17 @@ One short entry per non-✅ thread (and per ✅ thread when the reason isn't obv
 ## Clusters & steps
 ### Cluster: <name> — threads T2, T5, T9
 Root cause, chosen approach, then ordered concrete steps with file paths.
+
+## Implementation quality
+For each valid or partially valid cluster that changes production behavior:
+- **Responsibility and integration:** Where the behavior belongs and the
+  existing pattern to follow.
+- **Reuse and boundaries:** Existing code to reuse and any extraction or test
+  seam justified by real duplication or an external collaborator.
+- **Testability and behavior:** Observable cases and focused tests that prove
+  the fix without coupling to implementation details.
+
+For fully mechanical clusters, state why these criteria are not applicable.
 
 ## Assumptions
 Stated defaults with fallbacks for anything not verifiable from the code. (Not questions.)
@@ -131,6 +150,10 @@ it in this consumer.
 
 Plans recommend the cheapest **tier** that can reliably execute each step or
 cluster, judged by ambiguity and blast radius rather than feature importance.
+A task is not mechanical merely because its file list is short or its intended
+outcome is clear: new production behavior, a dependency boundary or test seam,
+and non-trivial test design require at least **standard**. Reserve **small**
+for isolated, fully specified mechanical work.
 Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
@@ -138,23 +161,23 @@ selected model is listed for, or verified above, the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
-| standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
+| small | isolated, fully specified mechanical work only: renames, nits, boilerplate, mirrored tests; never new behavior, dependency seams, or test strategy | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| standard | default: 2–5 files, clear requirement, established pattern; minimum for new behavior, dependency boundaries, or non-trivial test design | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
 | large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` (long-context variant: `kimi-k3-256k`) | `qwen3.8-max` | `grok-4.6` |
 | frontier | genuinely hard and costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model; long-context variant: `kimi-k3-256k`) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
 Model IDs are current as of **September 2026**. Providers ship often, so
 verify current availability before relying on an exact ID. Default to
-**standard** unless work is fully mechanical (small) or cross-cutting or
-ambiguous (large); use frontier only when large is insufficient and mistakes
-would be unusually costly.
+**standard** unless work is isolated and fully mechanical (small), or
+cross-cutting or ambiguous (large); use frontier only when large is
+insufficient and mistakes would be unusually costly.
 <!-- END GENERATED MODEL-TIER POLICY -->
 
 Rules:
 - When clusters vary, give the per-cluster split so the user can run cheap parts on a cheap model and switch only for the hard ones.
 - A user may switch providers between planning and execution if the execution model is listed for, or is verified above, the required tier.
 - A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
-- If the whole plan is small and mechanical, say so plainly: "small for everything."
+- If the whole plan is isolated and fully mechanical, say so plainly: "small for everything."
 
 ## Ending your turn
 

@@ -61,6 +61,27 @@ A plan with zero items under "Needs your decision" is the goal. Every item left 
 - Check `git status` / `git log --oneline -10` for in-flight work that the plan must account for.
 - Check whether `plan/` already contains a plan for the same topic (`ls plan/`). If so, read it and either update it in place or write a new versioned file — say which you did.
 
+## Quality planning
+
+For each plan that changes production behavior, turn design quality into
+concrete execution constraints rather than writing generic "clean code",
+SOLID, or DRY instructions:
+
+- Identify the existing owner for the behavior and the collaborators it
+  integrates with. Put the change at that responsibility boundary; do not add
+  a dependency injection layer or interface solely to make a task shorter.
+- Reuse the repository's established pattern where it fits. Extract shared
+  logic only when there is real duplication or a distinct responsibility, not
+  for a single call site.
+- State the observable behavior, its focused tests, and any test seam needed
+  to isolate a real external collaborator. Tests must exercise behavior, not
+  implementation details.
+
+Record these decisions in the plan's **Implementation quality** section. For
+documentation, formatting, or other fully mechanical work, state why each
+criterion is not applicable. Do not leave a behavior-changing plan without
+this contract.
+
 ## File naming
 
 Single-file plans: `plan/<YYYY-MM-DD>-<slug>.md`, where the date comes from `date +%F` and the slug is 2–5 lowercase hyphenated words describing the task (e.g. `plan/2026-08-26-api-rate-limiting.md`).
@@ -89,6 +110,16 @@ What this plan deliberately does not cover.
 
 ## Approach
 The chosen approach and *why*, plus alternatives considered and rejected (briefly).
+
+## Implementation quality
+- **Responsibility and integration:** Where the behavior belongs, the existing
+  pattern to follow, and the collaborators it uses.
+- **Reuse and boundaries:** What existing code is reused; any extraction or
+  seam that is justified by duplication or a real external boundary.
+- **Testability and behavior:** Observable cases and test seams that prove the
+  change without coupling tests to implementation details.
+- **Not applicable:** For fully mechanical work, state why each item above
+  does not apply.
 
 ## Steps
 Ordered, concrete, each step small enough to verify on its own.
@@ -138,6 +169,12 @@ What was learned during exploration, shared by all parts. File references (`path
 ## Approach
 The chosen approach for the whole task and *why*, plus alternatives considered and rejected (briefly).
 
+## Implementation quality
+Shared responsibility, reuse, boundary, and testability constraints for the
+parts below. Each behavior-changing part adds its specific details in its own
+**Implementation quality** section; for fully mechanical work, state why these
+criteria are not applicable.
+
 ## Parts
 Ordered list; each part is independently executable and reviewable.
 1. [Part 01 — <title>](<YYYY-MM-DD>-<slug>-01-<part>.md) — <one-line scope>. Depends on: none.
@@ -177,6 +214,16 @@ One or two sentences: what will be true when this part is done.
 
 ## Context
 Only what this part needs beyond the index — read the index first (`<YYYY-MM-DD>-<slug>.md`).
+
+## Implementation quality
+- **Responsibility and integration:** Where this part's behavior belongs and
+  the existing pattern it follows.
+- **Reuse and boundaries:** Existing code to reuse and any justified
+  extraction or external-collaborator seam.
+- **Testability and behavior:** Observable cases and tests that prove the
+  change without coupling to implementation details.
+- **Not applicable:** For fully mechanical work, explain why these criteria do
+  not apply.
 
 ## Steps
 Ordered, concrete, each step small enough to verify on its own.
@@ -220,6 +267,10 @@ it in this consumer.
 
 Plans recommend the cheapest **tier** that can reliably execute each step or
 cluster, judged by ambiguity and blast radius rather than feature importance.
+A task is not mechanical merely because its file list is short or its intended
+outcome is clear: new production behavior, a dependency boundary or test seam,
+and non-trivial test design require at least **standard**. Reserve **small**
+for isolated, fully specified mechanical work.
 Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
@@ -227,23 +278,23 @@ selected model is listed for, or verified above, the required tier.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
-| small | mechanical, fully specified: renames, nits, boilerplate, mirrored tests | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
-| standard | default: 2–5 files, clear requirement, established pattern | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
+| small | isolated, fully specified mechanical work only: renames, nits, boilerplate, mirrored tests; never new behavior, dependency seams, or test strategy | `claude-haiku-4-5` | `gpt-5.6-luna` | `gemini-3.5-flash-lite` | `kimi-k2.7-code-highspeed` (lowest-cost current option, not a small-capability model) | `qwen3.8-flash` | `grok-build-0.1` |
+| standard | default: 2–5 files, clear requirement, established pattern; minimum for new behavior, dependency boundaries, or non-trivial test design | `claude-sonnet-5` | `gpt-5.6-terra` | `gemini-3.7-flash` | `kimi-k2.8-preview` | `qwen3.7-plus` | `grok-4.3` |
 | large | cross-cutting or ambiguous: shared state, concurrency, unfamiliar code | `claude-opus-5-5` | `gpt-5.6-sol` | `gemini-3.8-flash` | `kimi-k3` (long-context variant: `kimi-k3-256k`) | `qwen3.8-max` | `grok-4.6` |
 | frontier | genuinely hard and costly to get wrong | `claude-fable-5-1` | `gpt-5.5-pro` | `gemini-3.8-flash` (no higher general-purpose production API model) | `kimi-k3` with `reasoning_effort: "max"` (no separate frontier model; long-context variant: `kimi-k3-256k`) | `qwen3.8-max` (no higher general-purpose production API model) | `grok-4.6` (no higher general-purpose production API model) |
 
 Model IDs are current as of **September 2026**. Providers ship often, so
 verify current availability before relying on an exact ID. Default to
-**standard** unless work is fully mechanical (small) or cross-cutting or
-ambiguous (large); use frontier only when large is insufficient and mistakes
-would be unusually costly.
+**standard** unless work is isolated and fully mechanical (small), or
+cross-cutting or ambiguous (large); use frontier only when large is
+insufficient and mistakes would be unusually costly.
 <!-- END GENERATED MODEL-TIER POLICY -->
 
 Rules:
 - When steps vary, give the per-step split so the user can run cheap parts on a cheap model and switch only for the hard ones.
 - A user may switch providers between planning and execution if the execution model is listed for, or is verified above, the required tier.
 - A well-written plan *lowers* the tier needed — if something needs *large* mainly because the plan is vague, tighten the plan instead.
-- If the whole plan is small and mechanical, say so plainly: "small for everything."
+- If the whole plan is isolated and fully mechanical, say so plainly: "small for everything."
 
 ## Ending your turn
 
