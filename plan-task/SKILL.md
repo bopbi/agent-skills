@@ -145,6 +145,11 @@ How to confirm it works: tests to run/add, manual checks, commands.
 - **Compatible model range:** List every provider/model entry from the canonical policy row matching the overall tier.
 - **Per step (only where it differs):** e.g. "Step 3 → large — compatible model range: list every provider/model entry from the matching row."
 - **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
+
+## How to execute
+Run `/run-plan` with this file when you are ready — or just say "run the plan" and
+`/run-plan` picks the newest draft in `plan/`. Fill in any blank `→ Decision:` lines
+under "Needs your decision" first: `/run-plan` refuses to start while one is open.
 ```
 
 ### Multi-file plan templates
@@ -197,6 +202,12 @@ Things that could go wrong during execution and what to watch for.
 - **Compatible model range:** List every provider/model entry from the canonical policy row matching the overall tier.
 - **Per part (only where it differs):** e.g. "Part 2 → large — compatible model range: list every provider/model entry from the matching row."
 - **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
+
+## How to execute
+Run `/run-plan` with this index file when you are ready — or just say "run the plan" and
+`/run-plan` picks the newest draft in `plan/`. It executes the parts above in order, one
+at a time, skipping any already marked done. Fill in any blank `→ Decision:` lines
+first: `/run-plan` refuses to start while one is open.
 ```
 
 Part template:
@@ -248,6 +259,11 @@ How to confirm this part works: tests to run/add, manual checks, commands.
 - **Overall tier:** <small | standard | large | frontier> — one sentence why, for this part.
 - **Compatible model range:** List every provider/model entry from the canonical policy row matching this part's tier.
 - **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
+
+## How to execute
+Run `/run-plan` with the index file to execute the parts in order, or name this part
+to run it standalone. Fill in any blank `→ Decision:` lines first: `/run-plan` refuses
+to start while one is open.
 ```
 
 ### Choosing the model recommendation

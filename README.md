@@ -11,7 +11,9 @@ Personal skills for coding agents ([Claude Code](https://claude.com/claude-code)
 Plans are written as markdown into `plan/` in your repo. They are meant to be read in your editor,
 left untracked (never committed), and never gitignored — so they stay visible and navigable in the IDE.
 Large tasks may be split into an index file plus ordered part files, so each chunk is planned,
-reviewed, and executed on its own.
+reviewed, and executed on its own. Every plan file ends with a **How to execute** footer, so the
+next step is always stated in the file itself: fill in any `→ Decision:` answers, then run
+`/run-plan` (it defaults to the newest draft in `plan/`).
 
 ## Skills
 

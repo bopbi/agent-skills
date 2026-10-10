@@ -131,6 +131,13 @@ Tests/lint/typecheck to run for the touched areas; any test that should be added
 - **Compatible model range:** List every provider/model entry from the canonical policy row matching the overall tier.
 - **Per cluster (only where it differs):** e.g. "Error handling → large — compatible model range: list every provider/model entry from the matching row."
 - **Execution compatibility:** Any listed model, or a verified higher-tier model, is acceptable even when it differs from the model used to create the plan. Record the actual provider, model, and tier in the execution log.
+
+## How to execute
+Run `/run-plan` with this file when you are ready — or just say "run the plan" and
+`/run-plan` picks the newest draft in `plan/`. Fill in any blank `→ Decision:` lines
+under "Needs your decision" first: `/run-plan` refuses to start while one is open.
+After the fixes are pushed, run `/pr-resolve` to reply to and resolve the addressed
+review threads.
 ```
 
 ### Choosing the model recommendation
