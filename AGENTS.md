@@ -32,8 +32,8 @@ regenerate it instead.
 ## Skill portability
 
 Skills in this repo install into multiple coding agents (Claude Code, Kimi
-Code, Cursor, Gemini CLI, Qwen Code, opencode), so SKILL.md bodies must stay
-agent-neutral:
+Code, Codex CLI, GitHub Copilot CLI, Cursor, Gemini CLI, Junie, Pi, Qwen
+Code, opencode), so SKILL.md bodies must stay agent-neutral:
 
 - Refer to the skill's own directory as `<skill-dir>` (the directory
   containing the SKILL.md, resolved from the path the agent loaded it from).

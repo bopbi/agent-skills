@@ -1,7 +1,8 @@
 #!/bin/bash
 # install-git.sh — install the agent-skills skills into the skills directory
-# of every supported agent found in $HOME (~/.claude, ~/.agents, ~/.cursor,
-# ~/.gemini, ~/.gemini/config, ~/.qwen, ~/.config/opencode).
+# of every supported agent found in $HOME (~/.claude, ~/.agents, ~/.codex,
+# ~/.copilot, ~/.cursor, ~/.gemini, ~/.gemini/config, ~/.junie, ~/.pi/agent,
+# ~/.qwen, ~/.config/opencode).
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/bopbi/agent-skills/HEAD/install-git.sh | bash
@@ -75,12 +76,16 @@ fi
 # agent before its skills home exists.
 # claude      → ~/.claude/skills                  Claude Code
 # agents      → ~/.agents/skills                 shared convention
+# codex       → ~/.codex/skills                  OpenAI Codex CLI
+# copilot     → ~/.copilot/skills                GitHub Copilot CLI
 # cursor      → ~/.cursor/skills                 Cursor
 # gemini      → ~/.gemini/skills                 Gemini CLI
 # antigravity → ~/.gemini/config/skills          Google Antigravity
+# junie       → ~/.junie/skills                  JetBrains Junie
+# pi          → ~/.pi/agent/skills               Pi
 # qwen        → ~/.qwen/skills                   Qwen Code (best-known path)
 # opencode    → ~/.config/opencode/skills        opencode
-PROVIDERS="claude:.claude agents:.agents cursor:.cursor gemini:.gemini antigravity:.gemini/config:.gemini/antigravity,.gemini/antigravity-cli,.antigravity-ide qwen:.qwen opencode:.config/opencode"
+PROVIDERS="claude:.claude agents:.agents codex:.codex copilot:.copilot cursor:.cursor gemini:.gemini antigravity:.gemini/config:.gemini/antigravity,.gemini/antigravity-cli,.antigravity-ide junie:.junie pi:.pi/agent qwen:.qwen opencode:.config/opencode"
 
 installed=0
 targets=0
