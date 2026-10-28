@@ -60,6 +60,7 @@ A plan with zero items under "Needs your decision" is the goal. Every item left 
 - Ground every step in real code: read the files you name, confirm symbols exist, cite `path:line`.
 - Check `git status` / `git log --oneline -10` for in-flight work that the plan must account for.
 - Check whether `plan/` already contains a plan for the same topic (`ls plan/`). If so, read it and either update it in place or write a new versioned file — say which you did.
+- When updating or refining an existing plan, make model recalibration the final required pass after the goal, scope, and steps are settled. Rebuild the entire **Model recommendation** from the final work and current canonical policy: overall tier and rationale, compatible model range, per-step overrides, and policy-defined reasoning-effort qualifiers. For a multi-file plan set, recalibrate the index and review every part so its overall and per-part recommendations match the final plan set. Remove stale entries instead of carrying them forward, and preserve unrelated content and execution history, including execution logs.
 
 ## Quality planning
 
@@ -291,6 +292,12 @@ Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
 selected model is listed for, or verified above, the required tier.
+On every plan creation, update, or refinement, recalibrate the **Model
+recommendation** from the final plan and this current policy: rebuild the
+overall tier and rationale, compatible model range, and applicable per-step,
+per-part, or per-cluster overrides, including any policy-defined
+reasoning-effort qualifiers. Remove stale overrides and effort qualifiers
+instead of carrying them forward.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|

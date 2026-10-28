@@ -84,6 +84,12 @@ Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
 selected model is listed for, or verified above, the required tier.
+On every plan creation, update, or refinement, recalibrate the **Model
+recommendation** from the final plan and this current policy: rebuild the
+overall tier and rationale, compatible model range, and applicable per-step,
+per-part, or per-cluster overrides, including any policy-defined
+reasoning-effort qualifiers. Remove stale overrides and effort qualifiers
+instead of carrying them forward.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|

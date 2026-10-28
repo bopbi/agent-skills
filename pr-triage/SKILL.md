@@ -70,6 +70,8 @@ Group threads that share a cause or pattern (same bug at multiple call sites →
 
 Path: `plan/<YYYY-MM-DD>-pr-<n>-review.md` (`date +%F`). If one already exists for this PR, update it in place and note what changed.
 
+When updating or refining an existing plan, recompute the **Model recommendation** after verdicts and clusters are finalized. Rebuild the overall tier and rationale, compatible model range, per-cluster entries, and policy-defined reasoning-effort qualifiers from the final work and current canonical policy. Per-cluster entries must match the final cluster names and scope; remove entries for renamed, merged, or deleted clusters rather than carrying them forward. Preserve unrelated content and execution history, including execution logs.
+
 For every valid or partially valid cluster that changes production behavior,
 populate **Implementation quality** with the owner for the behavior, relevant
 existing patterns, justified boundaries or seams, and behavior-focused tests.
@@ -165,6 +167,12 @@ Every recommendation also emits a **compatible model range**: one model from
 each supported provider at that tier. The tier is the requirement, not the
 provider that created the plan, so execution may switch providers when the
 selected model is listed for, or verified above, the required tier.
+On every plan creation, update, or refinement, recalibrate the **Model
+recommendation** from the final plan and this current policy: rebuild the
+overall tier and rationale, compatible model range, and applicable per-step,
+per-part, or per-cluster overrides, including any policy-defined
+reasoning-effort qualifiers. Remove stale overrides and effort qualifiers
+instead of carrying them forward.
 
 | Tier | Use for | Claude | OpenAI | Google | Kimi (Moonshot) | Qwen (Alibaba) | Grok (xAI) |
 |---|---|---|---|---|---|---|---|
